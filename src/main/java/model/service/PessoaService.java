@@ -35,7 +35,7 @@ public class PessoaService {
 		return repository.salvar(novaPessoa);
 	}
 	
-	// OK!
+	
 	public boolean alterar(Pessoa pessoaParaAlterar) throws ControleVacinasException{
 		validarPessoaParaAtualizarCadastro(pessoaParaAlterar);
 		return repository.alterar(pessoaParaAlterar);
@@ -49,14 +49,13 @@ public class PessoaService {
 	 */
 	// OK!
 	private void validarPessoaParaCadastro(Pessoa novaPessoa) throws ControleVacinasException {
-		verificar_CPF(novaPessoa);
+		verificar_CPF_Para_Cadastro(novaPessoa);
 		validarNumerosCPF(novaPessoa);
 		validarCamposPreenchidosDePessoa(novaPessoa);
 	}
 	
 	/**
-	 * " Verifica se todos todos os métodos necessários(com exceção do método 
-	 * verificar_CPF) para atualizar o cadastro da pessoa foram validados corretamente. "
+	 * " Verifica se todos os métodos necessários  para atualizar o cadastro da pessoa foram validados corretamente. "
 	 * @param novaPessoa
 	 * @throws ControleVacinasException
 	 * @return void
@@ -74,16 +73,16 @@ public class PessoaService {
 	 * @return void
 	 */
 	// OK !
-	private void verificar_CPF(Pessoa novaPessoa) throws ControleVacinasException{
-       if(repository.verificar_CPF(novaPessoa)!=false) {
+	private void verificar_CPF_Para_Cadastro(Pessoa novaPessoa) throws ControleVacinasException{
+       if(repository.verificar_CPF_Para_Cadastro(novaPessoa)!=false) {
         	throw new ControleVacinasException("Pessoa já cadastrada no sistema");
         } 
 	}
 	
 	
 	private void verificar_CPF_Para_Atualizar(Pessoa novaPessoa) throws ControleVacinasException{
-	       if(repository.verificar_CPF(novaPessoa)!=true) {
-	        	throw new ControleVacinasException("Pessoa já cadastrada no sistema");
+	       if(repository.verificar_CPF_Para_Atualizar(novaPessoa)!=true) {
+	        	throw new ControleVacinasException("Não é possível alterar o número do cpf.");
 	        } 
 		}
 

@@ -14,17 +14,43 @@ import model.entity.Pessoa;
 
 public class PessoaRepository implements BaseRepository<Pessoa>{
 	
-	public boolean verificar_CPF(Pessoa novaPessoa) {
+	// OK!
+	public boolean verificar_CPF_Para_Cadastro(Pessoa novaPessoa) {
 		 Connection conn = Banco.getConnection();
 		 Statement stmt = Banco.getStatement(conn);
 		 ResultSet resultado = null;
 		 boolean cpfExiste = false;
-		 String query = "select  *  from VACINACAO.PESSOA where PESSOA.id_Pessoa ="+novaPessoa.getCpf();
+		 String query = "select count(cpf) as contagem from VACINACAO.PESSOA where	cpf ="+novaPessoa.getCpf();
 		 try {
 			 resultado = stmt.executeQuery(query);
-			 cpfExiste = resultado.next();
+			 if(resultado.next()){
+				 int contagemDoNumeroDeRegistros = resultado.getInt("contagem");
+				 cpfExiste = contagemDoNumeroDeRegistros  == 1;
+			 }
 		 } catch(SQLException erro){
 			 System.out.println("Erro na tentativa de verificar se o cpf existe.");
+			 System.out.println("Erro: " + erro.getMessage());
+		 } finally {
+			 Banco.closeResultSet(resultado);
+			 Banco.closeStatement(stmt);
+			 Banco.closeConnection(conn);
+		 }
+		return cpfExiste;
+	}
+	
+	public boolean verificar_CPF_Para_Atualizar(Pessoa novaPessoa) {
+		 Connection conn = Banco.getConnection();
+		 Statement stmt = Banco.getStatement(conn);
+		 ResultSet resultado = null;
+		 boolean cpfExiste = false;
+		 String query = "select PESSOA.cpf as CPF from VACINACAO.PESSOA where PESSOA.id_pessoa ="+novaPessoa.getIdPessoa();
+		 try {
+			 resultado = stmt.executeQuery(query);
+			 if(resultado.next() && resultado.getString("CPF").equals(novaPessoa.getCpf())){
+				 cpfExiste = true;
+			 }
+		 } catch(SQLException erro){
+			 System.out.println("Erro na tentativa de verificar se o cpf existe para atualizar.");
 			 System.out.println("Erro: " + erro.getMessage());
 		 } finally {
 			 Banco.closeResultSet(resultado);
