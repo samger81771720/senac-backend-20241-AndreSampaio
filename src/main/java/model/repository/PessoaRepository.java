@@ -93,7 +93,6 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	            + "tipo = ?, nome = ?, dataNascimento = ?, sexo = ?, cpf = ? WHERE id_Pessoa = ?";
 	    Connection conn = Banco.getConnection();
 	    PreparedStatement pstmt = Banco.getPreparedStatement(conn, query);
-
 	    try {
 	        pstmt.setInt(1, pessoaParaAlterar.getTipo());
 	        pstmt.setString(2, pessoaParaAlterar.getNome());
@@ -101,9 +100,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	        pstmt.setString(4, pessoaParaAlterar.getSexo());
 	        pstmt.setString(5, pessoaParaAlterar.getCpf());
 	        pstmt.setInt(6, pessoaParaAlterar.getIdPessoa());
-
 	        alterou = pstmt.executeUpdate() > 0;
-	        
 	    } catch (SQLException erro) {
 	        System.out.println("Erro ao atualizar Pessoa");
 	        System.out.println("Erro: " + erro.getMessage());
@@ -111,7 +108,6 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	        Banco.closeStatement(pstmt);
 	        Banco.closeConnection(conn);
 	    }
-
 	    return alterou;
 	}
 
@@ -257,7 +253,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 				aplicacoesDaPessoa.add(aplicacao);
 			}
 		} catch (SQLException erro){
-			System.out.println("Erro ao executar consultar todas as cartas");
+			System.out.println("Erro ao executar consultar todas as aplicações da pessoa.");
 			System.out.println("Erro: " + erro.getMessage());
 		} finally {
 			Banco.closeResultSet(resultado);
