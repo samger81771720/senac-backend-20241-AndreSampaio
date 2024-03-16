@@ -1,5 +1,6 @@
 package controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import exception.ControleVacinasException;
 import jakarta.ws.rs.Consumes;
@@ -11,6 +12,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import model.entity.Aplicacao;
 import model.entity.Pessoa;
 import model.service.PessoaService;
 
@@ -46,9 +48,18 @@ public class PessoaController {
 	}
 	
 	@GET
-	@Path("/todas")
+	@Path("/consultarPessoas")
+	@Produces(MediaType.APPLICATION_JSON)
 	public List<Pessoa> consultarTodas(){
 		 return service.consultarTodas();
+	}
+	
+	@GET
+	@Path("/consultarAplicacoesDaPessoa/{idPessoa}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(@PathParam("idPessoa")int id){
+		return service.consultarTodasAplicacoesDaPessoa(id);
 	}
 	
 }

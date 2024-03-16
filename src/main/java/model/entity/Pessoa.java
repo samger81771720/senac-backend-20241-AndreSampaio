@@ -2,6 +2,7 @@
 package model.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Pessoa {
 	
@@ -11,6 +12,7 @@ public class Pessoa {
 	private LocalDate dataNascimento;
 	private String sexo;
 	private String cpf;
+	private ArrayList<Aplicacao>aplicacoesNaPessoa; 
 	
 	public Pessoa() {
 		super();
@@ -62,6 +64,14 @@ public class Pessoa {
 
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
+	}
+
+	public ArrayList<Aplicacao> getAplicacoesNaPessoa() {
+		return aplicacoesNaPessoa;
+	}
+
+	public void setAplicacoesNaPessoa(ArrayList<Aplicacao> aplicacoesNaPessoa) {
+		this.aplicacoesNaPessoa = aplicacoesNaPessoa;
 	}
 	
 }

@@ -64,4 +64,4 @@ INSERT INTO VACINACAO.APLICACAO_VACINA (id_Pessoa, id_Vacina, dataAplicacao, ava
 (7, 5, '2023-01-02', 4),
 (8, 6, '2023-01-03', 5);
 
-/**/
+

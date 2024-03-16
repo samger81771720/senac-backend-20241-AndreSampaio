@@ -7,7 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import model.entity.Aplicacao;
 import model.entity.Pessoa;
+import model.entity.Vacina;
 /*
  "PreparedStatement" - É o agente que encapsula e em seguida executa a consulta no banco de dados.
  */
@@ -187,7 +190,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	
 	@Override
 	public ArrayList<Pessoa> consultarTodos() {
-		ArrayList<Pessoa> pessoas = new ArrayList<>();
+		ArrayList<Pessoa> pessoas = new ArrayList<Pessoa>();
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
@@ -215,6 +218,53 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 			Banco.closeConnection(conn);
 		}
 		return pessoas;
+	}
+	
+	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(int id) {
+		ArrayList<Aplicacao> aplicacoesDaPessoa = new ArrayList<Aplicacao>();
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		String query = "select \r\n"
+				+ "	APLICACAO_VACINA.id_Aplicacao as ID_APLICACAO,\n"
+				+ "	APLICACAO_VACINA.dataAplicacao as DATA_APLICACAO,\n"
+				+ "	VACINA.nome as NOME_VACINA,\n"
+				+ "	PESSOA.nome as NOME_PESSOA,\n"
+				+ "	APLICACAO_VACINA.avaliacaoDaReacao as AVALIACAO_REACAO\n"
+				+ "from \r\n"
+				+ "	VACINACAO.PESSOA\n"
+				+ "inner join\n"
+				+ "	VACINACAO.VACINA on VACINA.id_Pesquisador = PESSOA.id_Pessoa\n"
+				+ "inner join VACINACAO.APLICACAO_VACINA on APLICACAO_VACINA.id_Pessoa = VACINA.id_Pesquisador and\n"
+				+ " 	VACINA.id_Vacina = APLICACAO_VACINA.id_Vacina\n"
+				+ "where\n"
+				+ "	PESSOA.id_Pessoa = "+id;
+		try{
+			resultado = stmt.executeQuery(query);
+			while(resultado.next()){
+				Aplicacao aplicacao = new Aplicacao();
+				Vacina nomeDaVacinaAplicada = new Vacina();
+				Pessoa nomeDaPessoaQueRecebeu = new Pessoa();
+				aplicacao.setIdAplicacao(Integer.parseInt(resultado.getString("ID_APLICACAO")));
+				if(resultado.getDate("DATA_APLICACAO")!=null) {
+					aplicacao.setDataAplicacao(resultado.getDate("DATA_APLICACAO").toLocalDate());
+				}
+				nomeDaVacinaAplicada.setNome(resultado.getString("NOME_VACINA"));
+				aplicacao.setVacinaAplicada(nomeDaVacinaAplicada);
+				nomeDaPessoaQueRecebeu.setNome(resultado.getString("NOME_PESSOA"));
+				aplicacao.setNomeDaPessoaQueRecebeu(nomeDaPessoaQueRecebeu);
+				aplicacao.setAvaliacaoReacao(resultado.getInt("AVALIACAO_REACAO"));
+				aplicacoesDaPessoa.add(aplicacao);
+			}
+		} catch (SQLException erro){
+			System.out.println("Erro ao executar consultar todas as cartas");
+			System.out.println("Erro: " + erro.getMessage());
+		} finally {
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return aplicacoesDaPessoa;
 	}
 	
 }

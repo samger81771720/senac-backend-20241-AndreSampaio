@@ -14,8 +14,10 @@ amigável"
 
 package model.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import exception.ControleVacinasException;
+import model.entity.Aplicacao;
 import model.entity.Pessoa;
 import model.repository.PessoaRepository;
 
@@ -134,6 +136,10 @@ public class PessoaService {
 	// OK - FUNCIONANDO!
 	public List<Pessoa> consultarTodas() {
 		return repository.consultarTodos();
+	}
+	
+	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(int id){
+		return repository.consultarTodasAplicacoesDaPessoa(id);
 	}
 
 }
