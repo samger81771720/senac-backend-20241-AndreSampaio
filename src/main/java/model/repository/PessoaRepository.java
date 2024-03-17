@@ -221,35 +221,61 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
-		String query = "select \r\n"
-				+ "	APLICACAO_VACINA.id_Aplicacao as ID_APLICACAO,\n"
-				+ "	APLICACAO_VACINA.dataAplicacao as DATA_APLICACAO,\n"
-				+ "	VACINA.nome as NOME_VACINA,\n"
-				+ "	PESSOA.nome as NOME_PESSOA,\n"
-				+ "	APLICACAO_VACINA.avaliacaoDaReacao as AVALIACAO_REACAO\n"
+		String query = "select\r\n"
+				+ "	APLICACAO_VACINA.id_Aplicacao as ID_APLICACAO,\r\n"
+				+ "	APLICACAO_VACINA.dataAplicacao as DATA_APLICACAO,\r\n"
+				+ "	APLICACAO_VACINA.avaliacaoDaReacao as AVALIACAO_REACAO,\r\n"
+				+ "	VACINA.id_Vacina as ID_VACINA,\r\n"
+				+ "	VACINA.id_Pesquisador as ID_PESQUISADOR,\r\n"
+				+ "	VACINA.nome as NOME_VACINA,\r\n"
+				+ "	VACINA.pais_Origem as PAIS_ORIGEM,\r\n"
+				+ "	VACINA.estagio_Da_Pesquisa as ESTAGIO_DA_PESQUISA,\r\n"
+				+ "	VACINA.dataInicioDaPesquisa as DATA_INICIO_DA_PESQUISA,\r\n"
+				+ "	PESSOA.id_Pessoa as ID_PESSOA,\r\n"
+				+ "	PESSOA.tipo as TIPO_DA_PESSOA,\r\n"
+				+ "	PESSOA.nome as NOME_DA_PESSOA,\r\n"
+				+ "	PESSOA.dataNascimento as DATA_NASCIMENTO,\r\n"
+				+ "	PESSOA.sexo as SEXO,\r\n"
+				+ "	PESSOA.cpf as CPF\r\n"
 				+ "from \r\n"
-				+ "	VACINACAO.PESSOA\n"
-				+ "inner join\n"
-				+ "	VACINACAO.VACINA on VACINA.id_Pesquisador = PESSOA.id_Pessoa\n"
-				+ "inner join VACINACAO.APLICACAO_VACINA on APLICACAO_VACINA.id_Pessoa = VACINA.id_Pesquisador and\n"
-				+ " 	VACINA.id_Vacina = APLICACAO_VACINA.id_Vacina\n"
-				+ "where\n"
+				+ "	VACINACAO.PESSOA\r\n"
+				+ "inner join\r\n"
+				+ "	VACINACAO.VACINA on VACINA.id_Pesquisador = PESSOA.id_Pessoa\r\n"
+				+ "inner join \r\n"
+				+ "	VACINACAO.APLICACAO_VACINA on APLICACAO_VACINA.id_Vacina  = VACINA.id_Vacina  \r\n"
+				+ "where\r\n"
 				+ "	PESSOA.id_Pessoa = "+id;
 		try{
 			resultado = stmt.executeQuery(query);
 			while(resultado.next()){
 				Aplicacao aplicacao = new Aplicacao();
-				Vacina nomeDaVacinaAplicada = new Vacina();
-				Pessoa nomeDaPessoaQueRecebeu = new Pessoa();
+				Vacina vacinaAplicada = new Vacina();
+				Pessoa id_Pesquisador = new Pessoa();
+				Pessoa pessoaQueRecebeu = new Pessoa();
 				aplicacao.setIdAplicacao(Integer.parseInt(resultado.getString("ID_APLICACAO")));
 				if(resultado.getDate("DATA_APLICACAO")!=null) {
 					aplicacao.setDataAplicacao(resultado.getDate("DATA_APLICACAO").toLocalDate());
 				}
-				nomeDaVacinaAplicada.setNome(resultado.getString("NOME_VACINA"));
-				aplicacao.setVacinaAplicada(nomeDaVacinaAplicada);
-				nomeDaPessoaQueRecebeu.setNome(resultado.getString("NOME_PESSOA"));
-				aplicacao.setNomeDaPessoaQueRecebeu(nomeDaPessoaQueRecebeu);
 				aplicacao.setAvaliacaoReacao(resultado.getInt("AVALIACAO_REACAO"));
+				vacinaAplicada.setIdVacina(resultado.getInt("ID_VACINA"));
+				id_Pesquisador.setIdPessoa(resultado.getInt("ID_PESQUISADOR"));
+				vacinaAplicada.setPesquisadorResponsavel(id_Pesquisador);
+				vacinaAplicada.setNome(resultado.getString("NOME_VACINA"));
+				vacinaAplicada.setPais_De_Origem(resultado.getString("PAIS_ORIGEM"));
+				vacinaAplicada.setEstagioDaVacina(resultado.getInt("ESTAGIO_DA_PESQUISA"));
+				if(resultado.getDate("DATA_INICIO_DA_PESQUISA")!=null) {
+					vacinaAplicada.setDataInicioPesquisa(resultado.getDate("DATA_INICIO_DA_PESQUISA").toLocalDate());
+				}
+				aplicacao.setVacinaAplicada(vacinaAplicada);
+				pessoaQueRecebeu.setIdPessoa(resultado.getInt("ID_PESSOA"));
+				pessoaQueRecebeu.setNome(resultado.getString("NOME_DA_PESSOA"));
+				pessoaQueRecebeu.setTipo(resultado.getInt("TIPO_DA_PESSOA"));
+				pessoaQueRecebeu.setSexo(resultado.getString("SEXO"));
+				pessoaQueRecebeu.setCpf(resultado.getString("CPF"));
+				if(resultado.getDate("DATA_NASCIMENTO")!=null){
+					pessoaQueRecebeu.setDataNascimento(resultado.getDate("DATA_NASCIMENTO").toLocalDate());
+				}
+				aplicacao.setPessoaQueRecebeu(pessoaQueRecebeu);
 				aplicacoesDaPessoa.add(aplicacao);
 			}
 		} catch (SQLException erro){
