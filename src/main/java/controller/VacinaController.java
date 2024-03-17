@@ -2,12 +2,14 @@ package controller;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import model.entity.Pessoa;
 import model.entity.Vacina;
 import model.service.VacinaService;
 
@@ -23,6 +25,12 @@ public class VacinaController {
 		return service.salvar(novaVacina);
 	}
 	
+	@GET
+	@Path("/{id}")
+	public Vacina consultarPorId(@PathParam("id")int id){
+		return service.consultarPorId(id);
+	}
+	
 	@DELETE
 	@Path("/{id}")
 	public boolean excluir(@PathParam("id") int id){
@@ -35,5 +43,5 @@ public class VacinaController {
 	public boolean alterar(Vacina vacinaParaAlterar) {
 		return service.alterar(vacinaParaAlterar);
 	}
-		
+
 }

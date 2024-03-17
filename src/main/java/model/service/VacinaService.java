@@ -14,6 +14,10 @@ public class VacinaService {
 		return repository.salvar(novaVacina);
 	}
 	
+	public Vacina consultarPorId(int id) {
+		return repository.consultarPorId(id);
+	}
+	
 	// OK!
 	public boolean excluir(int id) {
 		return repository.excluir(id);
@@ -23,5 +27,6 @@ public class VacinaService {
 	public boolean alterar(Vacina vacinaParaAlterar) {
 		return repository.alterar(vacinaParaAlterar);
 	}
+	
 	
 }
