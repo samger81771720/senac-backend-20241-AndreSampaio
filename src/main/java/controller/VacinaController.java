@@ -1,5 +1,8 @@
 package controller;
 
+import java.util.List;
+
+import exception.ControleVacinasException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -21,7 +24,7 @@ public class VacinaController {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Vacina Salvar(Vacina novaVacina) {
+	public Vacina Salvar(Vacina novaVacina) throws ControleVacinasException{
 		return service.salvar(novaVacina);
 	}
 	
@@ -29,6 +32,13 @@ public class VacinaController {
 	@Path("/{id}")
 	public Vacina consultarPorId(@PathParam("id")int id){
 		return service.consultarPorId(id);
+	}
+	
+	@GET
+	@Path("/consultarVacinas")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Vacina> consultarTodos(){
+		 return service.consultarTodos();
 	}
 	
 	@DELETE

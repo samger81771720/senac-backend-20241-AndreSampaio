@@ -8,10 +8,41 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import model.entity.Aplicacao;
 import model.entity.Pessoa;
 import model.entity.Vacina;
 
 public class VacinaRepository implements BaseRepository<Vacina>{
+	
+	// OK !
+	public int validarPesquisador(Vacina vacina) {
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		int tipoDaPessoa = 0;
+		String query ="select \r\n"
+				+ "	VACINACAO.PESSOA.tipo \r\n"
+				+ "from\r\n"
+				+ "	VACINACAO.PESSOA\r\n"
+				+ "where 	\r\n"
+				+ "	VACINACAO.PESSOA.nome ='"
+				+vacina.getPesquisadorResponsavel().getNome()+"'";
+		try {
+			resultado = stmt.executeQuery(query);
+			if(resultado.next()) {
+				tipoDaPessoa = resultado.getInt("tipo");
+				}
+			}catch (SQLException erro) {
+				System.out.println("Erro ao tentar consultar o pesquisador "
+						+vacina.getPesquisadorResponsavel().getNome());
+				System.out.println("Erro: "+erro.getMessage());
+			} finally {
+				Banco.closeResultSet(resultado);
+				Banco.closeStatement(stmt);
+				Banco.closeConnection(conn);
+			}
+		return tipoDaPessoa;
+}
 	
 	//OK!
 	@Override
@@ -163,8 +194,60 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	}
 	
 	@Override
-	public ArrayList<Vacina> consultarTodos(){
+	public ArrayList<Vacina> consultarTodos() {
+		ArrayList<Vacina> vacinas = new ArrayList<Vacina>();
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		String query = "select\r\n"
+				+ "	VACINACAO.VACINA.*,\r\n"
+				+ "	VACINACAO.PESSOA.id_Pessoa as idPesquisador,\r\n"
+				+ "	VACINACAO.PESSOA.nome as nomePesquisador,\r\n"
+				+ "	VACINACAO.PESSOA.dataNascimento as dataNascimento,\r\n"
+				+ "	VACINACAO.PESSOA.sexo as sexo,\r\n"
+				+ "	VACINACAO.PESSOA.cpf as cpf,\r\n"
+				+ "	VACINACAO.PESSOA.tipo as tipoPesquisador\r\n"
+				+ "from\r\n"
+				+ "	VACINACAO.VACINA\r\n"
+				+ "join\r\n"
+				+ "	VACINACAO.PESSOA on	VACINACAO.PESSOA.id_Pessoa = VACINACAO.VACINA.id_Pesquisador;";
+		try{
+			resultado = stmt.executeQuery(query);
+			while(resultado.next()){
+				Vacina vacina = new Vacina();
+				Pessoa pesquisadorResponsavel = new Pessoa();
+				vacina.setIdVacina(resultado.getInt("id_Vacina"));
+				pesquisadorResponsavel.setIdPessoa(resultado.getInt("idPesquisador"));
+				pesquisadorResponsavel.setNome(resultado.getString("nomePesquisador"));
+				if(resultado.getDate("dataNascimento")!=null) {
+					pesquisadorResponsavel.setDataNascimento(resultado.getDate("dataNascimento").toLocalDate());
+				}
+				pesquisadorResponsavel.setSexo(resultado.getString("sexo"));
+				pesquisadorResponsavel.setCpf(resultado.getString("cpf"));
+				pesquisadorResponsavel.setTipo(resultado.getInt("tipoPesquisador"));
+				vacina.setPesquisadorResponsavel(pesquisadorResponsavel);
+				
+				vacina.setNome(resultado.getString("nome"));
+				vacina.setPais_De_Origem(resultado.getString("pais_Origem"));
+				vacina.setEstagioDaVacina(resultado.getInt("estagio_Da_Pesquisa"));
+				if(resultado.getDate("dataInicioDaPesquisa")!=null) {
+					vacina.setDataInicioPesquisa(resultado.getDate("dataInicioDaPesquisa").toLocalDate());
+				}
+				vacinas.add(vacina);
+			}
+		} catch (SQLException erro){
+			System.out.println("Erro ao executar consultar todas as vacinas.");
+			System.out.println("Erro: " + erro.getMessage());
+		} finally {
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return vacinas;
+	}
+	
+	public ArrayList<Aplicacao> consultarTodasAplicacoesDaVacina(int id){
 		return null;
-	};
-
+	}
+	
 }

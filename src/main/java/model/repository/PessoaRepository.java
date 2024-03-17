@@ -206,7 +206,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 				pessoas.add(pessoa);
 			}
 		} catch (SQLException erro){
-			System.out.println("Erro ao executar consultar todas as cartas");
+			System.out.println("Erro ao executar consultar todas as pessoas");
 			System.out.println("Erro: " + erro.getMessage());
 		} finally {
 			Banco.closeResultSet(resultado);

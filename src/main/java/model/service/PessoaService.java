@@ -12,6 +12,12 @@ amigável"
  
  */
 
+/*throw: Usado para lançar explicitamente uma exceção dentro de um método.
+throws: Usado na assinatura de um método para indicar que esse método pode 
+lançar uma ou mais exceções e que métodos que o chamam devem lidar com essas 
+exceções ou também declarar que podem lançá-las.*/
+
+
 package model.service;
 
 import java.util.ArrayList;
@@ -134,7 +140,7 @@ public class PessoaService {
 	}
 	
 	// OK - FUNCIONANDO!
-	public List<Pessoa> consultarTodas() {
+	public List<Pessoa> consultarTodos() {
 		return repository.consultarTodos();
 	}
 	
