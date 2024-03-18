@@ -35,7 +35,7 @@ public class PessoaService {
 	private static final int VOLUNTARIO = 2 ;
 	private static final int PUBLICO_GERAL = 3;
 	
-	PessoaRepository repository = new PessoaRepository();
+	private PessoaRepository repository = new PessoaRepository();
 	
 	// OK!
 	public Pessoa salvar(Pessoa novaPessoa) throws ControleVacinasException{
@@ -58,7 +58,6 @@ public class PessoaService {
 	// OK!
 	private void validarPessoaParaCadastro(Pessoa novaPessoa) throws ControleVacinasException {
 		verificar_CPF_Para_Cadastro(novaPessoa);
-		validarNumerosCPF(novaPessoa);
 		validarCamposPreenchidosDePessoa(novaPessoa);
 	}
 	
@@ -70,7 +69,6 @@ public class PessoaService {
 	 */
 	private void validarPessoaParaAtualizarCadastro(Pessoa novaPessoa) throws ControleVacinasException {
 		verificar_CPF_Para_Atualizar(novaPessoa);
-		validarNumerosCPF(novaPessoa);
 		validarCamposPreenchidosDePessoa(novaPessoa);
 	}
 	
@@ -81,32 +79,18 @@ public class PessoaService {
 	 * @return void
 	 */
 	// OK !
-	private void verificar_CPF_Para_Cadastro(Pessoa novaPessoa) throws ControleVacinasException{
-       if(repository.verificar_CPF_Para_Cadastro(novaPessoa)!=false) {
-        	throw new ControleVacinasException("Pessoa já cadastrada no sistema");
+	private void verificar_CPF_Para_Cadastro(Pessoa pessoa) throws ControleVacinasException{
+       if(repository.verificar_CPF_Para_Cadastro(pessoa)!=false) {
+        	throw new ControleVacinasException("O cpf "+pessoa.getCpf()+" de "+pessoa.getNome()+" já se encontra cadastrado no sistema.");
         } 
 	}
-	
-	
+	//OK !
 	private void verificar_CPF_Para_Atualizar(Pessoa novaPessoa) throws ControleVacinasException{
 	       if(repository.verificar_CPF_Para_Atualizar(novaPessoa)!=true) {
-	        	throw new ControleVacinasException("Não é possível alterar o número do cpf.");
+	        	throw new ControleVacinasException("Não é possível alterar o número de cpf no cadastro.");
 	        } 
-		}
-
-	/**
-	 * "Garante que o cpf da pessoa seja preenchido 
-	 * com números de 0 à 9 e que sejam 11 números. "
-	 * @param novaPessoa
-	 * @return void
-	 */
-	// OK!
-	private  void validarNumerosCPF(Pessoa novaPessoa)throws ControleVacinasException {
-		if(!novaPessoa.getCpf().matches("\\d{11}")) {
-			throw new ControleVacinasException("O campo CPF precisa ser preenchido apenas com números e deve ter 11 dígitos");
-		}
 	}
-	
+
 	/**
 	 * "Verifica se todos os campos foram preenchidos conforme os critérios estabelecidos pelo sistema."
 	 * @param novaPessoa
@@ -115,27 +99,71 @@ public class PessoaService {
 	 */
 	// OK!
 	private void validarCamposPreenchidosDePessoa(Pessoa novaPessoa) throws ControleVacinasException {
-	    if (novaPessoa.getTipo() != PESQUISADOR && novaPessoa.getTipo() != VOLUNTARIO && novaPessoa.getTipo() != PUBLICO_GERAL) {
-	        throw new ControleVacinasException("Tipo de pessoa inválido. Deve ser Pesquisador, Voluntário ou Público Geral.");
+	   String mensagemValidacao = "";
+		if (novaPessoa.getTipo() != PESQUISADOR  || novaPessoa.getTipo() != VOLUNTARIO || novaPessoa.getTipo() != PUBLICO_GERAL) {
+			mensagemValidacao += " - A pessoa para ser cadastrada precisa ser um \"PESQUISADOR\", um \"VOLUNTÁRIO\" ou pertencer "
+					+ "ao \"PÚBLICO GERAL\", ou seja, \"1\", \"2\" ou \"3\". \n";
 	    }
 	    if (novaPessoa.getNome() == null || novaPessoa.getNome().isEmpty()) {
-	        throw new ControleVacinasException("O campo Nome é obrigatório.");
+	        mensagemValidacao += " - O campo nome precisa ser preenchido. \n";
+	    }
+	    if(novaPessoa.getNome().length()<2) {
+	    	mensagemValidacao += " - O campo nome precisa ter ao menos duas letras. \n";
+	    }
+	    if(novaPessoa.getNome().matches("[a-zA-Z]+")) {
+	    	mensagemValidacao += "O campo nome precisa ser preenchido apenas com letras. \n";
 	    }
 	    if (novaPessoa.getDataNascimento() == null) {
-	        throw new ControleVacinasException("O campo Data de Nascimento é obrigatório.");
+	        mensagemValidacao += " - O campo data de nascimento precisa ser preenchido. \n";
 	    }
 	    if (!novaPessoa.getSexo().toLowerCase().equals(SEXO_MASCULINO) && !novaPessoa.getSexo().toLowerCase().equals(SEXO_FEMININO)) {
-	        throw new ControleVacinasException("O campo Sexo é inválido. Deve ser 'm' para masculino ou 'f' para feminino.");
+	        mensagemValidacao += " - O campo sexo precisa ser informado apenas com um dois valores que são: \"M\" ou \"F\". \n";
+	    }
+	   if(novaPessoa.getNome().trim().isEmpty()) {
+		   mensagemValidacao += " - O campo nome não pode ser preenchido apenas com espaços. \n";
+	    }
+	    if(novaPessoa.getCpf().isBlank()) {
+	    	mensagemValidacao += " - O campo \"cpf\" precisa ser preenchido. \n";
+	    }
+	    if(novaPessoa.getCpf().length()!=11) {
+	    	mensagemValidacao += " - O campo \"cpf\" precisa ter 11 números. \n";
+	    }
+	    if(novaPessoa.getCpf().matches("[0-9]+")) {
+	    	mensagemValidacao += " - O campo \"cpf\" precisa ser preenchido apenas com números. \n";
+	    	/*O método matches() é um método fornecido pela classe String em Java, 
+	    	 que é usado para verificar se uma string corresponde a um determinado 
+	    	 padrão especificado por uma expressão regular. Ele retorna true se a string 
+	    	 corresponder ao padrão especificado. Ele retorna false se a string não corresponder 
+	    	 ao padrão. Expressão regular para verificar se o CPF contém apenas números:
+
+	    	A expressão regular "[0-9]+" é uma maneira de descrever um padrão de texto em que estamos 
+	    	procurando por um ou mais dígitos de 0 a 9. Aqui está o que cada parte significa:
+	    	[0-9]: Este é um conjunto de caracteres que inclui todos os dígitos de 0 a 9.
+	    	+: Este é um quantificador que indica que o padrão anterior (no nosso caso, [0-9]) deve aparecer 
+	    	uma ou mais vezes.
+	    	Portanto, a expressão regular "[0-9]+" corresponde a qualquer sequência de um ou mais dígitos 
+	    	de 0 a 9 em uma string. Quando aplicada à string do CPF, se ela contiver apenas dígitos de 0 a 9,
+	    	a expressão regular corresponderá a toda a string. Se houver outros caracteres, a correspondência falhará.
+	    	*/
+	    }
+	    if(!mensagemValidacao.isEmpty()) {
+	    	throw new ControleVacinasException("As observaçõe(s) a seguir precisa(m) ser atendida(s): \n"+mensagemValidacao);
 	    }
 	}
 
 	// OK - FUNCIONANDO!
-	public boolean excluir(int id) {
+	public boolean excluir(int id) throws ControleVacinasException{
+		if(repository.excluir(id)!=true) {
+			throw new ControleVacinasException("Não foi possível excluir a pessoa com o id informado.");
+		}
 		return repository.excluir(id);
 	}
 	
 	// OK - FUNCIONANDO!
-	public Pessoa consultarPorId(int id) {
+	public Pessoa consultarPorId(int id) throws ControleVacinasException{
+		if(repository.consultarPorId(id)==null) {
+			throw new ControleVacinasException("Não foi possível encontrar a pessoa com o id informado.");
+		}
 		return repository.consultarPorId(id);
 	}
 	
@@ -149,23 +177,3 @@ public class PessoaService {
 	}
 
 }
-
-/*
-O método cps.matches("\\d{11}") faz parte da classe String em Java e é 
-usado para verificar se a String atende a um padrão específico, chamado 
-de expressão regular.
-
-cps: Esta é a variável que armazena o CPS (Cadastro de Pessoas Físicas) 
-inserido pelo usuário. Assume-se que seja do tipo String.
-
-.matches(): Este é um método em Java que é utilizado para verificar se a 
-String dada corresponde à expressão regular especificada.
-
-"\\d{11}": Esta é a expressão regular:
-
-	\\d: Essa parte do padrão corresponde a qualquer dígito (0-9).
-	{11}: Isso especifica que exatamente 11 dígitos devem ser correspondidos.
-	Então, a expressão completa \\d{11} assegura que a string cps consista exatamente em 11 dígitos.
-
-	Em resumo, cps.matches("\\d{11}") retorna true se a string cps contiver exatamente 11 dígitos e false caso contrário. É uma maneira simples, mas eficaz, de validar se o CPS inserido está no formato especificado.
-*/

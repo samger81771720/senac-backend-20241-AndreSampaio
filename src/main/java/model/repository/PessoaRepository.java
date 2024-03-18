@@ -23,12 +23,12 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		 Statement stmt = Banco.getStatement(conn);
 		 ResultSet resultado = null;
 		 boolean cpfExiste = false;
-		 String query = "select count(cpf) as contagem from VACINACAO.PESSOA where	cpf ="+novaPessoa.getCpf();
+		 String query = "select count(id_Pessoa) as contagem from VACINACAO.PESSOA where	cpf ="+novaPessoa.getCpf();
 		 try {
 			 resultado = stmt.executeQuery(query);
 			 if(resultado.next()){
 				 int contagemDoNumeroDeRegistros = resultado.getInt("contagem");
-				 cpfExiste = contagemDoNumeroDeRegistros  == 1;
+				 cpfExiste = contagemDoNumeroDeRegistros  > 0;
 			 }
 		 } catch(SQLException erro){
 			 System.out.println("Erro na tentativa de verificar se o cpf existe.");
@@ -66,7 +66,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	// OK!
 	@Override
 	 public Pessoa salvar(Pessoa novaPessoa) {
-		 String query = "INSERT INTO VACINACAO.PESSOA (tipo,nome, dataNascimento, sexo, cpf)VALUES(?,?,?,?,?);";
+		 String query = "insert into VACINACAO.PESSOA (tipo,nome, dataNascimento, sexo, cpf)values(?,?,?,?,?);";
 		 Connection conn = Banco.getConnection();
 		 PreparedStatement pstmt = Banco.getPreparedStatementWithPk(conn, query);
 		 try {
@@ -184,6 +184,16 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		return pessoa;
 	}
 	
+	/*
+	 * O método Integer.parseInt em Java converte uma string 
+	 * em um número inteiro. Ele analisa a string fornecida como 
+	 * entrada e retorna o valor inteiro correspondente. 
+	
+	Por exemplo:
+
+	String numeroString = "123";
+	int numeroInteiro = Integer.parseInt(numeroString);
+*/
 	@Override
 	public ArrayList<Pessoa> consultarTodos() {
 		ArrayList<Pessoa> pessoas = new ArrayList<Pessoa>();

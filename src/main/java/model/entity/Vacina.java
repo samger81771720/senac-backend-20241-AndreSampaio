@@ -1,7 +1,6 @@
 package model.entity;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class Vacina {
 	
@@ -11,7 +10,6 @@ public class Vacina {
 	private Pessoa pesquisadorResponsavel;
 	private  int estagioDaVacina;
 	private LocalDate dataInicioPesquisa;
-	private ArrayList<Aplicacao> aplicacoesDaVacina;
 	
 	public Vacina() {
 		super();
@@ -65,12 +63,4 @@ public class Vacina {
 		this.dataInicioPesquisa = dataInicioPesquisa;
 	}
 
-	public ArrayList<Aplicacao> getAplicacoesDaVacina() {
-		return aplicacoesDaVacina;
-	}
-
-	public void setAplicacoesDaVacina(ArrayList<Aplicacao> aplicacoesDaVacina) {
-		this.aplicacoesDaVacina = aplicacoesDaVacina;
-	}
-	
 }
