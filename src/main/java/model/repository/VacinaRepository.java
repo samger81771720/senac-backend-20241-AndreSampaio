@@ -199,34 +199,15 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
-		String query = "select\r\n"
-				+ "	VACINACAO.VACINA.*,\r\n"
-				+ "	VACINACAO.PESSOA.id_Pessoa as idPesquisador,\r\n"
-				+ "	VACINACAO.PESSOA.nome as nomePesquisador,\r\n"
-				+ "	VACINACAO.PESSOA.dataNascimento as dataNascimento,\r\n"
-				+ "	VACINACAO.PESSOA.sexo as sexo,\r\n"
-				+ "	VACINACAO.PESSOA.cpf as cpf,\r\n"
-				+ "	VACINACAO.PESSOA.tipo as tipoPesquisador\r\n"
-				+ "from\r\n"
-				+ "	VACINACAO.VACINA\r\n"
-				+ "join\r\n"
-				+ "	VACINACAO.PESSOA on	VACINACAO.PESSOA.id_Pessoa = VACINACAO.VACINA.id_Pesquisador;";
+		String query = "select * from VACINACAO.VACINA";
 		try{
 			resultado = stmt.executeQuery(query);
 			while(resultado.next()){
 				Vacina vacina = new Vacina();
-				Pessoa pesquisadorResponsavel = new Pessoa();
 				vacina.setIdVacina(resultado.getInt("id_Vacina"));
-				pesquisadorResponsavel.setIdPessoa(resultado.getInt("idPesquisador"));
-				pesquisadorResponsavel.setNome(resultado.getString("nomePesquisador"));
-				if(resultado.getDate("dataNascimento")!=null) {
-					pesquisadorResponsavel.setDataNascimento(resultado.getDate("dataNascimento").toLocalDate());
-				}
-				pesquisadorResponsavel.setSexo(resultado.getString("sexo"));
-				pesquisadorResponsavel.setCpf(resultado.getString("cpf"));
-				pesquisadorResponsavel.setTipo(resultado.getInt("tipoPesquisador"));
-				vacina.setPesquisadorResponsavel(pesquisadorResponsavel);
-				
+				PessoaRepository pessoaRepository = new PessoaRepository();
+				Pessoa dadosPesquisadorResponsavel = pessoaRepository.consultarPorId(resultado.getInt("id_Pesquisador"));
+				vacina.setPesquisadorResponsavel(dadosPesquisadorResponsavel);
 				vacina.setNome(resultado.getString("nome"));
 				vacina.setPais_De_Origem(resultado.getString("pais_Origem"));
 				vacina.setEstagioDaVacina(resultado.getInt("estagio_Da_Pesquisa"));
