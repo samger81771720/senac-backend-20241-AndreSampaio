@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import model.entity.Aplicacao;
+import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;
 /*
@@ -66,7 +67,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	// OK!
 	@Override
 	 public Pessoa salvar(Pessoa novaPessoa) {
-		 String query = "insert into VACINACAO.PESSOA (tipo,nome, dataNascimento, sexo, cpf)values(?,?,?,?,?);";
+		 String query = "insert into VACINACAO.PESSOA (id_Pais, tipo, nome, dataNascimento, sexo, cpf)values(?,?,?,?,?,?);";
 		 Connection conn = Banco.getConnection();
 		 PreparedStatement pstmt = Banco.getPreparedStatementWithPk(conn, query);
 		 try {
@@ -90,16 +91,17 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	public boolean alterar(Pessoa pessoaParaAlterar) {
 	    boolean alterou = false;
 	    String query = "UPDATE VACINACAO.PESSOA SET "
-	            + "tipo = ?, nome = ?, dataNascimento = ?, sexo = ?, cpf = ? WHERE id_Pessoa = ?";
+	            + "id_Pais = ?, tipo = ?, nome = ?, dataNascimento = ?, sexo = ?, cpf = ? WHERE id_Pessoa = ?";
 	    Connection conn = Banco.getConnection();
 	    PreparedStatement pstmt = Banco.getPreparedStatement(conn, query);
 	    try {
-	        pstmt.setInt(1, pessoaParaAlterar.getTipo());
-	        pstmt.setString(2, pessoaParaAlterar.getNome());
-	        pstmt.setDate(3, Date.valueOf(pessoaParaAlterar.getDataNascimento()));
-	        pstmt.setString(4, pessoaParaAlterar.getSexo());
-	        pstmt.setString(5, pessoaParaAlterar.getCpf());
-	        pstmt.setInt(6, pessoaParaAlterar.getIdPessoa());
+	    	pstmt.setInt(1, pessoaParaAlterar.getPais().getId_Pais());
+	        pstmt.setInt(2, pessoaParaAlterar.getTipo());
+	        pstmt.setString(3, pessoaParaAlterar.getNome());
+	        pstmt.setDate(4, Date.valueOf(pessoaParaAlterar.getDataNascimento()));
+	        pstmt.setString(5, pessoaParaAlterar.getSexo());
+	        pstmt.setString(6, pessoaParaAlterar.getCpf());
+	        pstmt.setInt(7, pessoaParaAlterar.getIdPessoa());
 	        alterou = pstmt.executeUpdate() > 0;
 	    } catch (SQLException erro) {
 	        System.out.println("Erro ao atualizar Pessoa");
@@ -112,11 +114,12 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	}
 
 		private void preencherParametrosParaInsertOuUpdate(PreparedStatement pstmt, Pessoa novaPessoa) throws SQLException {
-	     pstmt.setInt(1, novaPessoa.getTipo());
-		 pstmt.setString(2, novaPessoa.getNome());
-		 pstmt.setDate(3, Date.valueOf(novaPessoa.getDataNascimento()));
-		 pstmt.setString(4,String.valueOf(novaPessoa.getSexo()));
-		 pstmt.setString(5, novaPessoa.getCpf());
+	     pstmt.setInt(1, novaPessoa.getPais().getId_Pais());
+		 pstmt.setInt(2, novaPessoa.getTipo());
+		 pstmt.setString(3, novaPessoa.getNome());
+		 pstmt.setDate(4, Date.valueOf(novaPessoa.getDataNascimento()));
+		 pstmt.setString(5,String.valueOf(novaPessoa.getSexo()));
+		 pstmt.setString(6, novaPessoa.getCpf());
 	}
 	
 	
@@ -150,20 +153,6 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		try {
 			resultado = stmt.executeQuery(query);
 			if(resultado.next()) {
-				/*A utilização do termo "Integer" no método Integer.parseInt pode causar 
-				  confusão, mas é importante entender que, neste contexto, "Integer" se
-				   refere ao tipo de dados em Java que representa números inteiros, não 
-				   a objetos do tipo Integer. O método parseInt faz parte da classe utilitária 
-				   Integer em Java, que contém métodos estáticos para operações relacionadas 
-				   a números inteiros. Apesar de ser chamado "parseInt," o resultado do método 
-				   é um valor primitivo do tipo int, não um objeto Integer. A escolha do nome
-				    Integer.parseInt pode parecer um pouco enganosa, mas é um remanescente 
-				    da época em que a programação orientada a objetos era mais enfatizada 
-				    em Java, e a conversão de tipos primitivos para objetos (como Integer) 
-				    era comum. Ainda assim, o método retorna um valor primitivo int. Se fosse 
-				    projetado nos dias de hoje, poderia ter um nome mais descritivo, como 
-				    convertStringToInt.
-				 */
 				pessoa.setIdPessoa(Integer.parseInt(resultado.getString("Id_Pessoa")));
 				pessoa.setTipo(resultado.getInt("tipo"));
 				pessoa.setNome(resultado.getString("nome"));
@@ -172,6 +161,9 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 				}
 				pessoa.setSexo(resultado.getString("sexo"));
 				pessoa.setCpf(resultado.getString("cpf"));
+				PaisRepository paisRepository = new PaisRepository();  
+				Pais paisDaPessoa =  paisRepository.consultarPorId(resultado.getInt("id_Pais"));
+				pessoa.setPais(paisDaPessoa);
 			}
 		} catch (SQLException erro) {
 			System.out.println("Erro ao tentar consultar a pessoa de id "+id);
@@ -213,6 +205,9 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 				}
 				pessoa.setSexo(resultado.getString("sexo"));
 				pessoa.setCpf(resultado.getString("cpf"));
+				PaisRepository paisRepository = new PaisRepository();
+				Pais paisDaPessoa = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
+				pessoa.setPais(paisDaPessoa);
 				pessoas.add(pessoa);
 			}
 		} catch (SQLException erro){

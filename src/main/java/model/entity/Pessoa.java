@@ -12,7 +12,8 @@ public class Pessoa {
 	private LocalDate dataNascimento;
 	private String sexo;
 	private String cpf;
-	private ArrayList<Aplicacao>aplicacoesNaPessoa; 
+	private ArrayList<Aplicacao>aplicacoesNaPessoa;
+	private Pais pais;
 	
 	public Pessoa() {
 		super();
@@ -72,6 +73,14 @@ public class Pessoa {
 
 	public void setAplicacoesNaPessoa(ArrayList<Aplicacao> aplicacoesNaPessoa) {
 		this.aplicacoesNaPessoa = aplicacoesNaPessoa;
+	}
+
+	public Pais getPais() {
+		return pais;
+	}
+
+	public void setPais(Pais pais) {
+		this.pais = pais;
 	}
 	
 }

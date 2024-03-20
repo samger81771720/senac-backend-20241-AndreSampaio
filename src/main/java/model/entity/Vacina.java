@@ -6,10 +6,10 @@ public class Vacina {
 	
 	private int idVacina;
 	private String nome; 
-	private String pais_De_Origem;
 	private Pessoa pesquisadorResponsavel;
 	private  int estagioDaVacina;
 	private LocalDate dataInicioPesquisa;
+	private Pais pais;
 	
 	public Vacina() {
 		super();
@@ -29,14 +29,6 @@ public class Vacina {
 
 	public void setNome(String nome) {
 		this.nome = nome;
-	}
-
-	public String getPais_De_Origem() {
-		return pais_De_Origem;
-	}
-
-	public void setPais_De_Origem(String pais_De_Origem) {
-		this.pais_De_Origem = pais_De_Origem;
 	}
 
 	public Pessoa getPesquisadorResponsavel() {
@@ -61,6 +53,14 @@ public class Vacina {
 
 	public void setDataInicioPesquisa(LocalDate dataInicioPesquisa) {
 		this.dataInicioPesquisa = dataInicioPesquisa;
+	}
+
+	public Pais getPais() {
+		return pais;
+	}
+
+	public void setPais(Pais pais) {
+		this.pais = pais;
 	}
 
 }

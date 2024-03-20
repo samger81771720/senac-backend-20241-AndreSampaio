@@ -7,14 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import model.entity.Aplicacao;
+import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;
 
 public class VacinaRepository implements BaseRepository<Vacina>{
 	
-	// OK !
 	public int validarPesquisador(Vacina vacina) {
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
@@ -44,45 +43,38 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 		return tipoDaPessoa;
 }
 	
-	//OK!
 	@Override
 	public Vacina salvar(Vacina novaVacina) {
-	   String queryPesquisador = "SELECT PESSOA.id_Pessoa FROM VACINACAO.PESSOA WHERE PESSOA.nome = ?";
-	   String queryInsert = "INSERT INTO VACINACAO.VACINA (id_Pesquisador, nome, pais_Origem, estagio_Da_Pesquisa, dataInicioDaPesquisa) "
-	    		+ "VALUES (?, ? , ? , ?, ? );";
+	   String query = "insert into VACINACAO.VACINA (id_Pesquisador, id_Pais, nome, estagio_Da_Pesquisa, dataInicioDaPesquisa) "
+	   		+ "values (?, ? , ? , ?, ? )";
 	    Connection conn = Banco.getConnection();
-	    PreparedStatement pstmtPesquisador = Banco.getPreparedStatement(conn, queryPesquisador);
-	    PreparedStatement pstmtInsert = Banco.getPreparedStatementWithPk(conn, queryInsert);
+	    PreparedStatement pstmt = Banco.getPreparedStatementWithPk(conn, query);
 	    try {
-	    	pstmtPesquisador.setString(1, novaVacina.getPesquisadorResponsavel().getNome());
-	    	ResultSet resultadoPesquisador = pstmtPesquisador.executeQuery();
-	        if(resultadoPesquisador.next()) {
-	        	int pesquisador_id = resultadoPesquisador.getInt(1);
-	            preencherParametrosParaInsertOuUpdate(pstmtInsert, novaVacina, pesquisador_id);
-	            pstmtInsert.execute();
-	            ResultSet resultado = pstmtInsert.getGeneratedKeys();
+	    	    preencherParametrosParaInsertOuUpdate(pstmt, novaVacina);
+	            pstmt.execute();
+	            ResultSet resultado = pstmt.getGeneratedKeys();
 	            if(resultado.next()) {
 	            	novaVacina.setIdVacina(resultado.getInt(1));
-	            }
 	        }
 	    } catch(SQLException erro){
 	        System.out.println("Erro na tentativa de salvar uma nova vacina no banco de dados.");
 	        System.out.println("Erro: " + erro.getMessage());
 	    } finally {
-	        Banco.closeStatement(pstmtPesquisador);
-	        Banco.closeStatement(pstmtInsert);
+	        Banco.closeStatement(pstmt);
 	        Banco.closeConnection(conn);
 	    }
 	    return novaVacina; 
 	}
 
 	// OK!
-	private void preencherParametrosParaInsertOuUpdate(PreparedStatement pstmt, Vacina novaVacina, int pesquisador_id) throws SQLException  {
-	    pstmt.setInt(1, pesquisador_id);
-	    pstmt.setString(2, novaVacina.getNome());
-	    pstmt.setString(3, novaVacina.getPais_De_Origem());
-	    pstmt.setInt(4, novaVacina.getEstagioDaVacina());
-	    pstmt.setDate(5, Date.valueOf(novaVacina.getDataInicioPesquisa()));
+	private void preencherParametrosParaInsertOuUpdate(PreparedStatement pstmt, Vacina novaVacina) throws SQLException  {
+	    pstmt.setInt(1, novaVacina.getPesquisadorResponsavel().getIdPessoa());
+		pstmt.setInt(2, novaVacina.getPais().getId_Pais());
+		pstmt.setString(3, novaVacina.getNome());
+		pstmt.setInt(4, novaVacina.getEstagioDaVacina());
+		if(novaVacina.getDataInicioPesquisa()!=null) {
+			pstmt.setDate(5, Date.valueOf(novaVacina.getDataInicioPesquisa()));
+		}
 	}
 	
 	// OK!
@@ -112,21 +104,20 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	    boolean alterou = false;
 	    String query = "update \r\n"
 	    		+ "	VACINACAO.VACINA \r\n"
-	    		+ "set \r\n"
-	    		+ "	VACINA.id_Pesquisador = ?, \r\n"
-	    		+ "	VACINA.nome = ?, \r\n"
-	    		+ "	VACINA.pais_Origem = ?, \r\n"
-	    		+ "	VACINA.estagio_Da_Pesquisa = ?, \r\n"
-	    		+ "	VACINA.dataInicioDaPesquisa=?\r\n"
-	    		+ "where \r\n"
-	    		+ "	VACINA.id_Vacina = ?;\r\n"
-	    		+ "";
+	    		+ "set\r\n"
+	    		+ "	VACINACAO.VACINA.id_Pesquisador = ?, \r\n"
+	    		+ "	VACINACAO.VACINA.id_Pais = ?,\r\n"
+	    		+ "	VACINACAO.VACINA.nome = ?,\r\n"
+	    		+ "	VACINACAO.VACINA.estagio_Da_Pesquisa = ?,\r\n"
+	    		+ "	VACINACAO.VACINA.dataInicioDaPesquisa = ? \r\n"
+	    		+ "where\r\n"
+	    		+ "	VACINA.id_Vacina = ?";
 	    Connection conn = Banco.getConnection();
 	    PreparedStatement pstmt = Banco.getPreparedStatement(conn, query);
 	    try {
 	    	pstmt.setInt(1, vacinaParaAlterar.getPesquisadorResponsavel().getIdPessoa());
-	        pstmt.setString(2, vacinaParaAlterar.getNome());
-	        pstmt.setString(3, vacinaParaAlterar.getPais_De_Origem());
+	    	pstmt.setInt(2, vacinaParaAlterar.getPais().getId_Pais());
+	        pstmt.setString(3, vacinaParaAlterar.getNome());
 	        pstmt.setInt(4, vacinaParaAlterar.getEstagioDaVacina());
 	        pstmt.setDate(5, Date.valueOf(vacinaParaAlterar.getDataInicioPesquisa()));
 	        pstmt.setInt(6, vacinaParaAlterar.getIdVacina());
@@ -141,46 +132,26 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	    return alterou;
 	}
 	
-	// OK!
 	@Override
 	public Vacina consultarPorId(int id) {
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
 		Vacina vacina = new Vacina();
-		Pessoa pesquisadorResponsavelVacina = new Pessoa();
-		String query="select\r\n"
-				+ "	VACINACAO.VACINA.*,\r\n"
-				+ "	VACINACAO.PESSOA.nome as nomePesquisador,\r\n"
-				+ "	VACINACAO.PESSOA.dataNascimento as dataNascimento,\r\n"
-				+ "	VACINACAO.PESSOA.sexo as sexo,\r\n"
-				+ "	VACINACAO.PESSOA.cpf as cpf,\r\n"
-				+ "	VACINACAO.PESSOA.tipo as tipoPesqusiador\r\n"
-				+ "from\r\n"
-				+ "	VACINACAO.VACINA\r\n"
-				+ "join\r\n"
-				+ "	VACINACAO.PESSOA on	VACINACAO.PESSOA.id_Pessoa = VACINACAO.VACINA.id_Pesquisador\r\n"
-				+ "where\r\n"
-				+ "	VACINACAO.VACINA.id_Vacina  ="+id;
+		Pessoa id_Pesquisador = new Pessoa();
+		Pais paisDaVacina = new Pais(); 
+		String query="select * from VACINACAO.VACINA where id_Vacina = "+id;
 		try {
 			resultado = stmt.executeQuery(query);
 			if(resultado.next()) {
 				vacina.setIdVacina(resultado.getInt("id_Vacina"));
-				pesquisadorResponsavelVacina.setIdPessoa(resultado.getInt("id_Pesquisador"));
-				pesquisadorResponsavelVacina.setNome(resultado.getString("nomePesquisador"));
-				if(resultado.getDate("dataNascimento")!=null) {
-					pesquisadorResponsavelVacina.setDataNascimento(resultado.getDate("dataNascimento").toLocalDate());
-				}
-				pesquisadorResponsavelVacina.setSexo(resultado.getString("sexo"));
-				pesquisadorResponsavelVacina.setCpf(resultado.getString("cpf"));
-				pesquisadorResponsavelVacina.setTipo(resultado.getInt("tipoPesqusiador"));
-				vacina.setPesquisadorResponsavel(pesquisadorResponsavelVacina);
+				id_Pesquisador.setIdPessoa(resultado.getInt("id_Pesquisador"));
+				vacina.setPesquisadorResponsavel(id_Pesquisador);
+				paisDaVacina.setId_Pais(resultado.getInt("id_Pais"));
+				vacina.setPais(paisDaVacina);
 				vacina.setNome(resultado.getString("nome"));
-				vacina.setPais_De_Origem(resultado.getString("pais_Origem"));
 				vacina.setEstagioDaVacina(resultado.getInt("estagio_Da_Pesquisa"));
-				if(resultado.getDate("dataInicioDaPesquisa")!=null) {
-					vacina.setDataInicioPesquisa(resultado.getDate("dataInicioDaPesquisa").toLocalDate());
-				}
+				vacina.setDataInicioPesquisa(resultado.getDate("dataInicioDaPesquisa").toLocalDate());
 			}
 		} catch (SQLException erro) {
 			System.out.println("Erro ao tentar consultar a vacina de id "+id);
@@ -206,14 +177,14 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 				Vacina vacina = new Vacina();
 				vacina.setIdVacina(resultado.getInt("id_Vacina"));
 				PessoaRepository pessoaRepository = new PessoaRepository();
-				Pessoa dadosPesquisadorResponsavel = pessoaRepository.consultarPorId(resultado.getInt("id_Pesquisador"));
-				vacina.setPesquisadorResponsavel(dadosPesquisadorResponsavel);
+				Pessoa id_Pesquisador = pessoaRepository.consultarPorId(resultado.getInt("id_Pesquisador"));
+				vacina.setPesquisadorResponsavel(id_Pesquisador);
+				Pais paisDaVacina = new Pais();
+				paisDaVacina.setId_Pais(resultado.getInt("id_Pais"));
+				vacina.setPais(paisDaVacina);
 				vacina.setNome(resultado.getString("nome"));
-				vacina.setPais_De_Origem(resultado.getString("pais_Origem"));
 				vacina.setEstagioDaVacina(resultado.getInt("estagio_Da_Pesquisa"));
-				if(resultado.getDate("dataInicioDaPesquisa")!=null) {
-					vacina.setDataInicioPesquisa(resultado.getDate("dataInicioDaPesquisa").toLocalDate());
-				}
+				vacina.setDataInicioPesquisa(resultado.getDate("dataInicioDaPesquisa").toLocalDate());
 				vacinas.add(vacina);
 			}
 		} catch (SQLException erro){
@@ -225,10 +196,6 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 			Banco.closeConnection(conn);
 		}
 		return vacinas;
-	}
-	
-	public ArrayList<Aplicacao> consultarTodasAplicacoesDaVacina(int id){
-		return null;
 	}
 	
 }
