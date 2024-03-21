@@ -3,6 +3,7 @@ package model.service;
 import java.util.ArrayList;
 
 import exception.ControleVacinasException;
+import model.entity.Aplicacao;
 import model.entity.Vacina;
 import model.repository.VacinaRepository;
 
@@ -50,6 +51,5 @@ public class VacinaService {
 	public boolean alterar(Vacina vacinaParaAlterar) {
 		return repository.alterar(vacinaParaAlterar);
 	}
-	
 	
 }

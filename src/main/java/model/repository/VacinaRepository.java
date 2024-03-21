@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import model.entity.Aplicacao;
 import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;

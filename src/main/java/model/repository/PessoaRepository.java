@@ -98,7 +98,9 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	    	pstmt.setInt(1, pessoaParaAlterar.getPais().getId_Pais());
 	        pstmt.setInt(2, pessoaParaAlterar.getTipo());
 	        pstmt.setString(3, pessoaParaAlterar.getNome());
-	        pstmt.setDate(4, Date.valueOf(pessoaParaAlterar.getDataNascimento()));
+	        if(pessoaParaAlterar.getDataNascimento()!=null) {
+	        	pstmt.setDate(4, Date.valueOf(pessoaParaAlterar.getDataNascimento()));
+	        }
 	        pstmt.setString(5, pessoaParaAlterar.getSexo());
 	        pstmt.setString(6, pessoaParaAlterar.getCpf());
 	        pstmt.setInt(7, pessoaParaAlterar.getIdPessoa());
@@ -122,7 +124,28 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		 pstmt.setString(6, novaPessoa.getCpf());
 	}
 	
-	
+	public boolean verificarSePessoaFoiVacinada(int id) {
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		boolean recebeu = false;
+		String query="select * from VACINACAO.APLICACAO_VACINA where VACINACAO.APLICACAO_VACINA.id_Pessoa = "+id;
+		try {
+			resultado = stmt.executeQuery(query);
+			if(resultado.next()) {
+				recebeu = true;
+			}
+		} catch (SQLException erro) {
+			System.out.println("Erro ao tentar consultar a(s) aplicação(s) da pessoa de id "+id);
+			System.out.println("Erro: "+erro.getMessage());
+		} finally {
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return recebeu;
+	}
+		
 	@Override
 	public boolean excluir(int id) {
 		Connection conn = Banco.getConnection();
@@ -142,7 +165,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		}
 		return excluiu;
 	}
-		
+	
 	@Override
 	public Pessoa consultarPorId(int id) {
 		Connection conn = Banco.getConnection();
@@ -152,8 +175,12 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		String query="SELECT * FROM VACINACAO.PESSOA WHERE PESSOA.id_Pessoa = "+id;
 		try {
 			resultado = stmt.executeQuery(query);
+			PaisRepository paisRepository = new PaisRepository();
+			AplicacoesDaVacinaRepository listaDeVacinasDaPessoa = new AplicacoesDaVacinaRepository();
 			if(resultado.next()) {
-				pessoa.setIdPessoa(Integer.parseInt(resultado.getString("Id_Pessoa")));
+				pessoa.setIdPessoa(resultado.getInt("Id_Pessoa"));
+				Pais paisDaPessoa = paisRepository.consultarPorId(id); 
+				pessoa.setPais(paisDaPessoa);
 				pessoa.setTipo(resultado.getInt("tipo"));
 				pessoa.setNome(resultado.getString("nome"));
 				if(resultado.getDate("dataNascimento")!=null) {
@@ -161,9 +188,8 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 				}
 				pessoa.setSexo(resultado.getString("sexo"));
 				pessoa.setCpf(resultado.getString("cpf"));
-				PaisRepository paisRepository = new PaisRepository();  
-				Pais paisDaPessoa =  paisRepository.consultarPorId(resultado.getInt("id_Pais"));
-				pessoa.setPais(paisDaPessoa);
+				ArrayList<Aplicacao> listaAplicacoesNaPessoa = listaDeVacinasDaPessoa.consultarTodasAplicacoesDaPessoa(id);
+				pessoa.setAplicacoesNaPessoa(listaAplicacoesNaPessoa);
 			}
 		} catch (SQLException erro) {
 			System.out.println("Erro ao tentar consultar a pessoa de id "+id);
@@ -186,6 +212,8 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	String numeroString = "123";
 	int numeroInteiro = Integer.parseInt(numeroString);
 */
+	
+	//OK
 	@Override
 	public ArrayList<Pessoa> consultarTodos() {
 		ArrayList<Pessoa> pessoas = new ArrayList<Pessoa>();
@@ -195,9 +223,13 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		String query = " SELECT * FROM VACINACAO.PESSOA";
 		try{
 			resultado = stmt.executeQuery(query);
+			PaisRepository paisRepository = new PaisRepository();
+			AplicacoesDaVacinaRepository listaDeVacinasDaPessoa = new AplicacoesDaVacinaRepository();
 			while(resultado.next()){
 				Pessoa pessoa = new Pessoa();
-				pessoa.setIdPessoa(Integer.parseInt(resultado.getString("id_Pessoa")));
+				pessoa.setIdPessoa(resultado.getInt("id_Pessoa"));
+				Pais paisDaPessoa = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
+				pessoa.setPais(paisDaPessoa);
 				pessoa.setTipo(Integer.parseInt(resultado.getString("tipo")));
 				pessoa.setNome(resultado.getString("nome"));
 				if(resultado.getDate("dataNascimento")!=null) {
@@ -205,9 +237,8 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 				}
 				pessoa.setSexo(resultado.getString("sexo"));
 				pessoa.setCpf(resultado.getString("cpf"));
-				PaisRepository paisRepository = new PaisRepository();
-				Pais paisDaPessoa = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
-				pessoa.setPais(paisDaPessoa);
+				ArrayList<Aplicacao> listaAplicacoesNaPessoa = listaDeVacinasDaPessoa.consultarTodasAplicacoesDaPessoa(resultado.getInt("id_Pessoa"));
+				pessoa.setAplicacoesNaPessoa(listaAplicacoesNaPessoa);
 				pessoas.add(pessoa);
 			}
 		} catch (SQLException erro){
@@ -219,39 +250,6 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 			Banco.closeConnection(conn);
 		}
 		return pessoas;
-	}
-	
-	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(int id) {
-		ArrayList<Aplicacao> aplicacoesDaPessoa = new ArrayList<Aplicacao>();
-		Connection conn = Banco.getConnection();
-		Statement stmt = Banco.getStatement(conn);
-		ResultSet resultado = null;
-		String query = "select * from VACINACAO.APLICACAO_VACINA "
-				+ "where VACINACAO.APLICACAO_VACINA.id_Pessoa  ="+id;
-		try{
-			resultado = stmt.executeQuery(query);
-			while(resultado.next()){
-				Aplicacao aplicacao = new Aplicacao();
-				VacinaRepository vacinaRepository = new VacinaRepository();
-				aplicacao.setIdAplicacao(resultado.getInt("id_Aplicacao"));
-				aplicacao.setIdPessoa(resultado.getInt("id_Pessoa"));
-				Vacina vacinaAplicada = vacinaRepository.consultarPorId(resultado.getInt("id_Vacina"));
-				aplicacao.setVacinaAplicada(vacinaAplicada);
-				if(resultado.getDate("dataAplicacao")!=null) {
-					aplicacao.setDataAplicacao(resultado.getDate("dataAplicacao").toLocalDate());
-				aplicacao.setAvaliacaoReacao(resultado.getInt("avaliacaoDaReacao"));
-				}
-				aplicacoesDaPessoa.add(aplicacao);
-			}
-		} catch (SQLException erro){
-			System.out.println("Erro ao executar consultar todas as aplicações da pessoa.");
-			System.out.println("Erro: " + erro.getMessage());
-		} finally {
-			Banco.closeResultSet(resultado);
-			Banco.closeStatement(stmt);
-			Banco.closeConnection(conn);
-		}
-		return aplicacoesDaPessoa;
 	}
 	
 }

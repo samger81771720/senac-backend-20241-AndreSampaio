@@ -54,12 +54,4 @@ public class PessoaController {
 		 return service.consultarTodos();
 	}
 	
-	@GET
-	@Path("/consultarAplicacoesDaPessoa/{idPessoa}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(@PathParam("idPessoa")int id){
-		return service.consultarTodasAplicacoesDaPessoa(id);
-	}
-	
 }

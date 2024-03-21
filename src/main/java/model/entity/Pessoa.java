@@ -12,8 +12,9 @@ public class Pessoa {
 	private LocalDate dataNascimento;
 	private String sexo;
 	private String cpf;
-	private ArrayList<Aplicacao>aplicacoesNaPessoa;
 	private Pais pais;
+	private ArrayList<Aplicacao>aplicacoesNaPessoa;
+	
 	
 	public Pessoa() {
 		super();

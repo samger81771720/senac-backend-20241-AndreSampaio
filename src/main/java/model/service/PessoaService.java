@@ -100,7 +100,8 @@ public class PessoaService {
 	// OK!
 	private void validarCamposPreenchidosDePessoa(Pessoa novaPessoa) throws ControleVacinasException {
 	   String mensagemValidacao = "";
-		if (novaPessoa.getTipo() != PESQUISADOR  || novaPessoa.getTipo() != VOLUNTARIO || novaPessoa.getTipo() != PUBLICO_GERAL) {
+	   String cpf = novaPessoa.getCpf();
+		if (novaPessoa.getTipo() != PESQUISADOR  && novaPessoa.getTipo() != VOLUNTARIO && novaPessoa.getTipo() != PUBLICO_GERAL) {
 			mensagemValidacao += " - A pessoa para ser cadastrada precisa ser um \"PESQUISADOR\", um \"VOLUNTÁRIO\" ou pertencer "
 					+ "ao \"PÚBLICO GERAL\", ou seja, \"1\", \"2\" ou \"3\". \n";
 	    }
@@ -128,7 +129,7 @@ public class PessoaService {
 	    if(novaPessoa.getCpf().length()!=11) {
 	    	mensagemValidacao += " - O campo \"cpf\" precisa ter 11 números. \n";
 	    }
-	    if(novaPessoa.getCpf().matches("[0-9]+")) {
+	    if(!cpf.matches("[0-9]+")) {
 	    	mensagemValidacao += " - O campo \"cpf\" precisa ser preenchido apenas com números. \n";
 	    	/*O método matches() é um método fornecido pela classe String em Java, 
 	    	 que é usado para verificar se uma string corresponde a um determinado 
@@ -150,13 +151,19 @@ public class PessoaService {
 	    	throw new ControleVacinasException("As observaçõe(s) a seguir precisa(m) ser atendida(s): \n"+mensagemValidacao);
 	    }
 	}
-
-	// OK - FUNCIONANDO!
+	
+	// VERIFICAR
 	public boolean excluir(int id) throws ControleVacinasException{
-		if(repository.excluir(id)!=true) {
-			throw new ControleVacinasException("Não foi possível excluir a pessoa com o id informado.");
-		}
+		verificarSePessoaFoiVacinada(id); 
+
 		return repository.excluir(id);
+	}
+	
+	// VERIFICAR
+	public void verificarSePessoaFoiVacinada(int id) throws ControleVacinasException {
+		if(repository.verificarSePessoaFoiVacinada(id)) {
+			throw new ControleVacinasException("Não é possível excluir a pessoa, pois já possui registro(s) de vacina(s)");
+		} 
 	}
 	
 	// OK - FUNCIONANDO!
@@ -170,10 +177,6 @@ public class PessoaService {
 	// OK - FUNCIONANDO!
 	public List<Pessoa> consultarTodos() {
 		return repository.consultarTodos();
-	}
-	
-	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(int id){
-		return repository.consultarTodasAplicacoesDaPessoa(id);
 	}
 
 }
