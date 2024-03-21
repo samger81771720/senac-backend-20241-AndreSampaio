@@ -179,7 +179,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 			AplicacoesDaVacinaRepository listaDeVacinasDaPessoa = new AplicacoesDaVacinaRepository();
 			if(resultado.next()) {
 				pessoa.setIdPessoa(resultado.getInt("Id_Pessoa"));
-				Pais paisDaPessoa = paisRepository.consultarPorId(id); 
+				Pais paisDaPessoa = paisRepository.consultarPorId(resultado.getInt("id_Pais")); 
 				pessoa.setPais(paisDaPessoa);
 				pessoa.setTipo(resultado.getInt("tipo"));
 				pessoa.setNome(resultado.getString("nome"));
@@ -247,7 +247,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		} finally {
 			Banco.closeResultSet(resultado);
 			Banco.closeStatement(stmt);
-			Banco.closeConnection(conn);
+			
 		}
 		return pessoas;
 	}
