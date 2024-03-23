@@ -14,49 +14,94 @@ import model.entity.Vacina;
 public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 
 	@Override
-	public Aplicacao salvar(Aplicacao registroDaAplicacaoDaVacina) {
+	public Aplicacao salvar(Aplicacao novoRegistroDaAplicacaoDaVacina) {
 		String query = "insert into VACINACAO.APLICACAO_VACINA (id_Pessoa, id_Vacina, dataAplicacao, avaliacaoDaReacao) values(?,?,?,?)";
 		Connection conn = Banco.getConnection();
 		PreparedStatement pstmt = Banco.getPreparedStatementWithPk(conn, query);
 		try {
-			preencherParametrosParaInsertOuUpdate(pstmt, registroDaAplicacaoDaVacina);
+			preencherParametrosParaInsert(pstmt, novoRegistroDaAplicacaoDaVacina);
 			pstmt.execute();
 			ResultSet resultado = pstmt.getGeneratedKeys();
 			if(resultado.next()) {
-				registroDaAplicacaoDaVacina.setIdAplicacao(resultado.getInt(1));
+				novoRegistroDaAplicacaoDaVacina.setIdAplicacao(resultado.getInt(1));
 			}
 		} catch(SQLException erro) {
 			System.out.println("Erro na tentativa de salvar um novo registro de aplicação de vacina no banco de dados da pessoa de id "
-					+registroDaAplicacaoDaVacina.getIdAplicacao());
+					+novoRegistroDaAplicacaoDaVacina.getIdAplicacao());
 			System.out.println("Erro: "+erro);
 		} finally {
 			Banco.closePreparedStatement(pstmt);
 			Banco.closeConnection(conn);
 		}
-		return registroDaAplicacaoDaVacina;
+		return novoRegistroDaAplicacaoDaVacina;
 	}
 	
-	private void preencherParametrosParaInsertOuUpdate(PreparedStatement pstmt, Aplicacao registroDaAplicacaoDaVacina) throws SQLException {
+	private void preencherParametrosParaInsert(PreparedStatement pstmt, Aplicacao registroDaAplicacaoDaVacina) throws SQLException {
 		pstmt.setInt(1, registroDaAplicacaoDaVacina.getIdPessoa());
 		pstmt.setInt(2, registroDaAplicacaoDaVacina.getVacinaAplicada().getIdVacina());
 		if(registroDaAplicacaoDaVacina.getDataAplicacao() != null) {
 			pstmt.setDate(3, Date.valueOf(registroDaAplicacaoDaVacina.getDataAplicacao()));
-			pstmt.setInt(4, registroDaAplicacaoDaVacina.getAvaliacaoReacao());
 		}
+		pstmt.setInt(4, registroDaAplicacaoDaVacina.getAvaliacaoReacao());
 	}
 	
 	@Override
 	public boolean excluir(int id) {
-		// TODO Stub de método gerado automaticamente
-		return false;
+		boolean excluiu = false;
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		String query = "delete from VACINACAO.APLICACAO_VACINA where id_Aplicacao  =  " + id;
+		try {
+			if(stmt.executeUpdate(query) == 1) {
+				excluiu = true;
+			}
+		} catch (Exception erro) {
+			System.out.println("Erro ao tentar excluir a o registro de aplicação da vacina do cadastro.");
+			System.out.println("Erro: " + erro.getMessage());
+		} finally {
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return excluiu; 
 	}
-
+	
 	@Override
-	public boolean alterar(Aplicacao entidade) {
-		// TODO Stub de método gerado automaticamente
-		return false;
+	public boolean alterar(Aplicacao registroDaAplicacaoDaVacinaAlterado) {
+		boolean alterou = false;
+		String query = "update\r\n"
+				+ "	VACINACAO.APLICACAO_VACINA\r\n"
+				+ "set\r\n"
+				+ "	id_Pessoa = ?,\r\n"
+				+ "	id_Vacina = ?,\r\n"
+				+ "	dataAplicacao = ?,\r\n"
+				+ "	avaliacaoDaReacao = ?\r\n"
+				+ "where\r\n"
+				+ "	id_Aplicacao = ? ";
+		Connection conn = Banco.getConnection();
+		PreparedStatement pstmt = Banco.getPreparedStatement(conn, query);
+		try {
+			preencherParametrosParaUpdate(pstmt, registroDaAplicacaoDaVacinaAlterado);
+			alterou = pstmt.executeUpdate() > 0;
+		}catch (Exception erro) {
+			System.out.println("Erro na tentaiva de atualizar o registro da aplicação da vacina.");
+			System.out.println("Erro: "+ erro);
+		}finally {
+			Banco.closePreparedStatement(pstmt);
+			Banco.closeConnection(conn);
+		}
+		return alterou;
 	}
-
+	
+	private void preencherParametrosParaUpdate(PreparedStatement pstmt, Aplicacao registroDaAplicacaoDaVacinaAlterado) throws SQLException {
+		pstmt.setInt(1, registroDaAplicacaoDaVacinaAlterado.getIdPessoa());
+		pstmt.setInt(2, registroDaAplicacaoDaVacinaAlterado.getVacinaAplicada().getIdVacina());
+		if(registroDaAplicacaoDaVacinaAlterado.getDataAplicacao() != null) {
+			pstmt.setDate(3, Date.valueOf(registroDaAplicacaoDaVacinaAlterado.getDataAplicacao()));
+		}
+		pstmt.setInt(4, registroDaAplicacaoDaVacinaAlterado.getAvaliacaoReacao());
+		pstmt.setInt(5, registroDaAplicacaoDaVacinaAlterado.getIdAplicacao());
+	}
+	
 	public Aplicacao consultarPorId(int id) {
 		Connection coon = Banco.getConnection();
 		Statement stmt = Banco.getStatement(coon);
@@ -88,9 +133,34 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 	}
 
 	@Override
-	public ArrayList<Aplicacao> consultarTodos() {
-		// TODO Stub de método gerado automaticamente
-		return null;
+	public ArrayList<Aplicacao>consultarTodos(){
+		ArrayList<Aplicacao>listaDeAplicacoesDaPessoa = new ArrayList<Aplicacao>();
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		String query = "select * from VACINACAO.APLICACAO_VACINA";
+		ResultSet resultado = null;
+		try {
+			resultado = stmt.executeQuery(query);
+			while(resultado.next()) {
+				Aplicacao aplicacaoDaPessoa = new Aplicacao();
+				VacinaRepository vacinaRepository = new VacinaRepository();
+				aplicacaoDaPessoa.setIdAplicacao(resultado.getInt("id_Aplicacao"));
+				aplicacaoDaPessoa.setIdPessoa(resultado.getInt("id_Pessoa"));
+				Vacina vacinaAplicadaNaPessoa = vacinaRepository.consultarPorId(resultado.getInt("id_Vacina"));
+				aplicacaoDaPessoa.setVacinaAplicada(vacinaAplicadaNaPessoa);
+				aplicacaoDaPessoa.setDataAplicacao(resultado.getDate("dataAplicacao").toLocalDate());
+				aplicacaoDaPessoa.setAvaliacaoReacao(resultado.getInt("avaliacaoDaReacao"));
+				listaDeAplicacoesDaPessoa.add(aplicacaoDaPessoa);
+			}
+		} catch (Exception e) {
+			System.out.println("Erro ao executar consultar todas as aplicações de vacina da pessoa.");
+			System.out.println();
+		} finally {
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return listaDeAplicacoesDaPessoa;
 	}
 	
 	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(int id) {

@@ -13,11 +13,30 @@ import javax.sql.DataSource;
 
 public class Banco {
 	
-//	@Resource(name="jdbc/sistema")
+// @Resource(name="jdbc/sistema")
 //	private static DataSource ds;
 	
 	private static final String NAME_DATASOURCE = "SenacDS";
 	
+	/*Context initContext = new InitialContext();: Cria um objeto InitialContext, 
+	 * que é usado para realizar operações de pesquisa no ambiente de contexto.
+
+Context envContext = (Context) initContext.lookup("java:/comp/env");: 
+Obtém o contexto de ambiente (environment context) do contexto inicial. 
+Este contexto é geralmente usado para procurar recursos configurados no ambiente.
+
+DataSource ds = (DataSource) envContext.lookup(NAME_DATASOURCE);: 
+Realiza uma pesquisa no contexto de ambiente para encontrar o recurso de
+ origem de dados (DataSource) com o nome especificado na constante 
+ NAME_DATASOURCE. O objeto DataSource representa uma fonte de 
+ conexão com um banco de dados.
+
+Connection conn = ds.getConnection();: Obtém uma conexão do DataSource 
+encontrado na etapa anterior. Isso é feito chamando o método getConnection()
+ no objeto DataSource. Este método retorna uma conexão com o banco de dados.
+
+return conn;: Retorna a conexão obtida. Se tudo ocorrer sem erros até este ponto, 
+uma conexão bem-sucedida foi estabelecida e é retornada pelo método.*/
 	
 	public static Connection getConnection(){
 		try {
