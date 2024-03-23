@@ -258,11 +258,23 @@ INSERT INTO VACINACAO.VACINA (id_Pesquisador, id_Pais, nome, estagio_Da_Pesquisa
 (2, 150, 'Vacina 2', 2, '2023-03-20'),
 (3, 20, 'Vacina 3', 1, '2023-05-10'),
 (4, 70, 'Vacina 4', 3, '2023-07-05'),
-(1, 103, 'Vacina 5', 2, '2023-09-12');
+(1, 103, 'Vacina 5', 2, '2023-09-12'),
+(1, 55, 'Vacina 2', 3, '2023-10-11');
 
 INSERT INTO VACINACAO.APLICACAO_VACINA (id_Pessoa, id_Vacina, dataAplicacao, avaliacaoDaReacao) VALUES
 (3, 1, '2023-02-01', 4),
 (1, 2, '2023-04-10', 5),
 (2, 3, '2023-06-20', 3),
 (5, 4, '2023-08-15', 2),
-(4, 5, '2023-10-25', 5);
+(4, 5, '2023-10-25', 5),
+(4, 5, '2023-10-24', 4),
+(4, 5, '2023-10-23', 3),
+(4, 5, '2023-10-22', 2),
+(4, 5, '2023-10-21', 1);
+
+
+
+select * from VACINACAO.PAIS;
+select * from VACINACAO.PESSOA;
+select * from VACINACAO.VACINA;
+select * from VACINACAO.APLICACAO_VACINA;

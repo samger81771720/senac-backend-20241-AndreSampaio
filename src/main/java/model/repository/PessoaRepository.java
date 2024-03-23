@@ -176,7 +176,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		try {
 			resultado = stmt.executeQuery(query);
 			PaisRepository paisRepository = new PaisRepository();
-			AplicacoesDaVacinaRepository listaDeVacinasDaPessoa = new AplicacoesDaVacinaRepository();
+			AplicacaoRepository listaDeVacinasDaPessoa = new AplicacaoRepository();
 			if(resultado.next()) {
 				pessoa.setIdPessoa(resultado.getInt("Id_Pessoa"));
 				Pais paisDaPessoa = paisRepository.consultarPorId(resultado.getInt("id_Pais")); 
@@ -224,7 +224,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		try{
 			resultado = stmt.executeQuery(query);
 			PaisRepository paisRepository = new PaisRepository();
-			AplicacoesDaVacinaRepository listaDeVacinasDaPessoa = new AplicacoesDaVacinaRepository();
+			AplicacaoRepository listaDeVacinasDaPessoa = new AplicacaoRepository();
 			while(resultado.next()){
 				Pessoa pessoa = new Pessoa();
 				pessoa.setIdPessoa(resultado.getInt("id_Pessoa"));

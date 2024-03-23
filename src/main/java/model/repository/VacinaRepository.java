@@ -137,6 +137,7 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
 		Vacina vacina = new Vacina();
+		Pessoa idPesquisador = new Pessoa();
 		PessoaRepository pessoaRepository = new PessoaRepository(); 
 		PaisRepository paisRepository = new PaisRepository();
 		String query="select * from VACINACAO.VACINA where id_Vacina = "+id;
@@ -145,8 +146,8 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 			if(resultado.next()) {
 				vacina.setIdVacina(resultado.getInt("id_Vacina"));
 				vacina.setNome(resultado.getString("nome"));
-				//Pessoa pesquisador = pessoaRepository.consultarPorId(resultado.getInt("id_Pesquisador"));
-				//vacina.setPesquisadorResponsavel(pesquisador);
+				idPesquisador.setIdPessoa(resultado.getInt("id_Pesquisador"));
+				vacina.setPesquisadorResponsavel(idPesquisador);
 				Pais paisDaVacina = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
 				vacina.setPais(paisDaVacina);
 				vacina.setEstagioDaVacina(resultado.getInt("estagio_Da_Pesquisa"));
