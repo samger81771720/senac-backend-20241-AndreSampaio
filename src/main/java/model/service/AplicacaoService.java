@@ -8,6 +8,8 @@ import model.repository.AplicacaoRepository;
 
 public class AplicacaoService {
 	
+	private static final int NOTA_MAXIMA = 5;
+	
 	private AplicacaoRepository repository = new AplicacaoRepository();
 	
 	public Aplicacao salvar(Aplicacao novoRegistroDaAplicacaoDaVacina) throws ControleVacinasException{
@@ -26,14 +28,12 @@ public class AplicacaoService {
 		if(novoRegistroDaAplicacaoDaVacina.getIdPessoa()==0) {
 			mensagem += "O campo \"id\" da pessoa vacinada é obrigatório.";
 		}
-		if(novoRegistroDaAplicacaoDaVacina.getVacinaAplicada().getIdVacina()==0) {
+		if(novoRegistroDaAplicacaoDaVacina.getVacinaAplicada().getIdVacina()==0 || novoRegistroDaAplicacaoDaVacina.getVacinaAplicada()==null) {
 			mensagem += "O campo \"id\" da vacina aplicada é obrigatório.";
 		}
-		if (!novoRegistroDaAplicacaoDaVacina.getDataAplicacao().isEqual(LocalDate.now())) {
-		    mensagem += "A data de vacinação precisa ser a data atual.";
-		}
-		if(novoRegistroDaAplicacaoDaVacina.getAvaliacaoReacao()==0) {
-			novoRegistroDaAplicacaoDaVacina.setAvaliacaoReacao(5);
+		novoRegistroDaAplicacaoDaVacina.setDataAplicacao(LocalDate.now());
+		if(novoRegistroDaAplicacaoDaVacina.getAvaliacaoReacao() == 0) {
+			novoRegistroDaAplicacaoDaVacina.setAvaliacaoReacao(NOTA_MAXIMA);
 		}
 		if(!mensagem.isEmpty()) {
 			throw new ControleVacinasException("A(s) observaçõe(s) listada(s) precisa(m) ser atendida)s) "
