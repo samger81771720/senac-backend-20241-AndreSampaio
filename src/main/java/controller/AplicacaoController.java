@@ -48,10 +48,17 @@ public class AplicacaoController {
 	}
 	
 	@GET
-	@Path("/consultarTodasAplicacoes")
+	@Path("/consultarTodos")
 	@Produces(MediaType.APPLICATION_JSON)
 	public ArrayList<Aplicacao> consultarTodos(){
 		return service.consultarTodos();
+	}
+	
+	@GET
+	@Path("/consultarTodasAplicacoesDaPessoa/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(@PathParam("id")int id) {
+		return service.consultarTodasAplicacoesDaPessoa(id);
 	}
 	
 }

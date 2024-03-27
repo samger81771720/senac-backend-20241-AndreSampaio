@@ -106,16 +106,15 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 		Connection coon = Banco.getConnection();
 		Statement stmt = Banco.getStatement(coon);
 		ResultSet resultado = null;
-		Aplicacao aplicacaoDaPessoa = new Aplicacao();
+		Aplicacao aplicacaoDaPessoa = null;
 		String query = "select * from VACINACAO.APLICACAO_VACINA where id_Aplicacao = " + id;
 		try {
 			resultado = stmt.executeQuery(query);
 			if(resultado.next()) {
-				PessoaRepository pessoaRepository = new PessoaRepository();
+				aplicacaoDaPessoa = new Aplicacao();
 				VacinaRepository vacinaRepository = new VacinaRepository();
 				aplicacaoDaPessoa.setIdAplicacao(resultado.getInt("id_Aplicacao"));
-				Pessoa pessoaQueRecebeuAplicacao = pessoaRepository.consultarPorId(resultado.getInt("id_Pessoa"));
-				aplicacaoDaPessoa.setIdPessoa(pessoaQueRecebeuAplicacao.getIdPessoa());
+				aplicacaoDaPessoa.setIdPessoa(resultado.getInt("id_Pessoa"));
 				Vacina vacinaAplicada = vacinaRepository.consultarPorId(resultado.getInt("id_Vacina"));
 				aplicacaoDaPessoa.setVacinaAplicada(vacinaAplicada);
 				aplicacaoDaPessoa.setDataAplicacao(resultado.getDate("dataAplicacao").toLocalDate());

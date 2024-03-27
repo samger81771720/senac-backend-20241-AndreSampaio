@@ -2,6 +2,9 @@ package model.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+
+import com.google.protobuf.Service;
+
 import exception.ControleVacinasException;
 import model.entity.Aplicacao;
 import model.repository.AplicacaoRepository;
@@ -57,6 +60,10 @@ public class AplicacaoService {
 	
 	public ArrayList<Aplicacao> consultarTodos(){
 		return repository.consultarTodos();
+	}
+	
+	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(int id) {
+		return repository.consultarTodasAplicacoesDaPessoa(id);
 	}
 
 }

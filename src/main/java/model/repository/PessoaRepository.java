@@ -103,6 +103,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	        }
 	        pstmt.setString(5, pessoaParaAlterar.getSexo());
 	        pstmt.setString(6, pessoaParaAlterar.getCpf());
+	        
 	        pstmt.setInt(7, pessoaParaAlterar.getIdPessoa());
 	        alterou = pstmt.executeUpdate() > 0;
 	    } catch (SQLException erro) {
@@ -171,16 +172,15 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
-		Pessoa pessoa = new Pessoa();
+		Pessoa pessoa = null;
 		String query="SELECT * FROM VACINACAO.PESSOA WHERE PESSOA.id_Pessoa = "+id;
 		try {
 			resultado = stmt.executeQuery(query);
 			PaisRepository paisRepository = new PaisRepository();
-			AplicacaoRepository listaDeVacinasDaPessoa = new AplicacaoRepository();
+			AplicacaoRepository listaDeAplicacoesDaPessoaRepository = new AplicacaoRepository();
 			if(resultado.next()) {
+				pessoa = new Pessoa();
 				pessoa.setIdPessoa(resultado.getInt("Id_Pessoa"));
-				Pais paisDaPessoa = paisRepository.consultarPorId(resultado.getInt("id_Pais")); 
-				pessoa.setPais(paisDaPessoa);
 				pessoa.setTipo(resultado.getInt("tipo"));
 				pessoa.setNome(resultado.getString("nome"));
 				if(resultado.getDate("dataNascimento")!=null) {
@@ -188,8 +188,8 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 				}
 				pessoa.setSexo(resultado.getString("sexo"));
 				pessoa.setCpf(resultado.getString("cpf"));
-				ArrayList<Aplicacao> listaAplicacoesNaPessoa = listaDeVacinasDaPessoa.consultarTodasAplicacoesDaPessoa(id);
-				pessoa.setAplicacoesNaPessoa(listaAplicacoesNaPessoa);
+				pessoa.setPais(paisRepository.consultarPorId(resultado.getInt("id_Pais")));
+				pessoa.setAplicacoesNaPessoa(listaDeAplicacoesDaPessoaRepository.consultarTodasAplicacoesDaPessoa(resultado.getInt("id_Pessoa")));
 			}
 		} catch (SQLException erro) {
 			System.out.println("Erro ao tentar consultar a pessoa de id "+id);
@@ -224,7 +224,6 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		try{
 			resultado = stmt.executeQuery(query);
 			PaisRepository paisRepository = new PaisRepository();
-			AplicacaoRepository listaDeVacinasDaPessoa = new AplicacaoRepository();
 			while(resultado.next()){
 				Pessoa pessoa = new Pessoa();
 				pessoa.setIdPessoa(resultado.getInt("id_Pessoa"));
@@ -237,8 +236,6 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 				}
 				pessoa.setSexo(resultado.getString("sexo"));
 				pessoa.setCpf(resultado.getString("cpf"));
-				ArrayList<Aplicacao> listaAplicacoesNaPessoa = listaDeVacinasDaPessoa.consultarTodasAplicacoesDaPessoa(resultado.getInt("id_Pessoa"));
-				pessoa.setAplicacoesNaPessoa(listaAplicacoesNaPessoa);
 				pessoas.add(pessoa);
 			}
 		} catch (SQLException erro){
