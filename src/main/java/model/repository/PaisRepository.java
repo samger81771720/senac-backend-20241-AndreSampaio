@@ -1,6 +1,7 @@
 package model.repository;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -36,9 +37,23 @@ public class PaisRepository implements BaseRepository<Pais> {
 	}
 
 	@Override
-	public Pais salvar(Pais novaEntidade) {
-		// TODO Stub de método gerado automaticamente
-		return null;
+	public Pais salvar(Pais novoPais) {
+		String sql = "insert into VACINACAO.PAIS (nome, sigla) values(?, ?)";
+		Connection conexao = Banco.getConnection();
+		PreparedStatement stmt = Banco.getPreparedStatementWithPk(conexao, sql);
+		try {
+			stmt.setString(1, novoPais.getNome());
+			stmt.setString(2, novoPais.getSigla());
+			stmt.execute();
+			ResultSet resultado = stmt.getGeneratedKeys();
+			if(resultado.next()) {
+				novoPais.setId_Pais(resultado.getInt(1));
+			}
+		} catch (SQLException e) {
+			System.out.println("Erro ao salvar novo país");
+			System.out.println("Erro: " + e.getMessage());
+		}
+		return novoPais;
 	}
 
 	@Override

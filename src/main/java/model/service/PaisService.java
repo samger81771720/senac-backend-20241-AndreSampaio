@@ -14,4 +14,9 @@ public class PaisService {
 		}
 		return repository.consultarPorId(id);
 	}
+	
+	public Pais salvar(Pais novoPais) {
+		return repository.salvar(novoPais);
+	}
+	
 }
