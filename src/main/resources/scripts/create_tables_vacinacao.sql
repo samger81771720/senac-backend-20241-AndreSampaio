@@ -1,6 +1,6 @@
 
 
--- drop database if exists VACINACAO;
+-- ddrop database if exists VACINACAO;
 
 create schema if not exists VACINACAO;
 
