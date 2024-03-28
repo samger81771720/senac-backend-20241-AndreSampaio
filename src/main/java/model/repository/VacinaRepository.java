@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import model.entity.Aplicacao;
 import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;
@@ -64,8 +66,8 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	    }
 	    return novaVacina; 
 	}
-
-	// OK!
+	
+		// OK!
 	private void preencherParametrosParaInsertOuUpdate(PreparedStatement pstmt, Vacina novaVacina) throws SQLException  {
 	    pstmt.setInt(1, novaVacina.getPesquisadorResponsavel().getIdPessoa());
 		pstmt.setInt(2, novaVacina.getPais().getId_Pais());
@@ -75,6 +77,8 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 			pstmt.setDate(5, Date.valueOf(novaVacina.getDataInicioPesquisa()));
 		}
 	}
+	
+	
 	
 	// OK!
 	@Override
