@@ -2,21 +2,27 @@ package model.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
-import com.google.protobuf.Service;
-
 import exception.ControleVacinasException;
 import model.entity.Aplicacao;
 import model.repository.AplicacaoRepository;
+import model.repository.PessoaRepository;
 
 public class AplicacaoService {
 	
+	// NO MEU BANCO DE DADOS O PESQUISADOR = 1, VOLUNTÁRIO = 2 e PUBLICO GERAL = 3
+	private static final int PESQUISADOR = 1;
+	private static final int PESQUISADOR_OU_VOLUNTARIO = 2; 
+	private static final int INICIAL = 1;
+	private static final int TESTES = 2;
 	private static final int NOTA_MAXIMA = 5;
+	
+	private PessoaRepository pessoaRepository = new PessoaRepository();
 	
 	private AplicacaoRepository repository = new AplicacaoRepository();
 	
 	public Aplicacao salvar(Aplicacao novoRegistroDaAplicacaoDaVacina) throws ControleVacinasException{
 		validarCamposPreenchidosDeAplicacao(novoRegistroDaAplicacaoDaVacina);
+		validarPermissaoParaVacinar(novoRegistroDaAplicacaoDaVacina);
 		return repository.salvar(novoRegistroDaAplicacaoDaVacina);
 	}
 
@@ -65,5 +71,19 @@ public class AplicacaoService {
 	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(int id) {
 		return repository.consultarTodasAplicacoesDaPessoa(id);
 	}
+	
+	//- Ao aplicar uma dose de vacina (inserir/atualizar vacinação), o sistema deve verificar se a pessoa pode
+		// receber a vacina em questão, consoante a seguinte regra
+		private void validarPermissaoParaVacinar(Aplicacao novoRegistroDaAplicacaoDaVacina) throws ControleVacinasException{
+			if(novoRegistroDaAplicacaoDaVacina.getVacinaAplicada().getEstagioDaVacina()==INICIAL  
+					&& pessoaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getIdPessoa()).getIdPessoa()!=PESQUISADOR ){ 
+				throw new ControleVacinasException("No estágio inicial da vacina, apenas os pesquisadores podem ser vacinados.");
+			}
+			if(novoRegistroDaAplicacaoDaVacina.getVacinaAplicada().getEstagioDaVacina()==TESTES 
+					&&pessoaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getIdPessoa()).getIdPessoa()!=PESQUISADOR 
+					|| pessoaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getIdPessoa()).getIdPessoa()!=PESQUISADOR_OU_VOLUNTARIO ) {
+				throw new ControleVacinasException("No estágio de testes da vacina, apenas os pesquisadores ou voluntários podem ser vacinados.");
+			}
+		}
 
 }

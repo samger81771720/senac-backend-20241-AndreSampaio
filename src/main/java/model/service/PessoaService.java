@@ -20,10 +20,8 @@ exceções ou também declarar que podem lançá-las.*/
 
 package model.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import exception.ControleVacinasException;
-import model.entity.Aplicacao;
 import model.entity.Pessoa;
 import model.repository.PessoaRepository;
 
@@ -152,17 +150,16 @@ public class PessoaService {
 	    }
 	}
 	
-	// VERIFICAR
 	public boolean excluir(int id) throws ControleVacinasException{
-		verificarSePessoaFoiVacinada(id); 
+		verificarSeTomouPrimeiraDose(id); 
 
 		return repository.excluir(id);
 	}
 	
-	// VERIFICAR
-	public void verificarSePessoaFoiVacinada(int id) throws ControleVacinasException {
+	// Pessoa não pode ser excluída caso já tenha recebido pelo menos uma dose vacina; 
+	private void verificarSeTomouPrimeiraDose(int id) throws ControleVacinasException {
 		if(repository.verificarSePessoaFoiVacinada(id)) {
-			throw new ControleVacinasException("Não é possível excluir a pessoa, pois já possui registro(s) de vacina(s)");
+			throw new ControleVacinasException("Não é possível excluir a pessoa, pois já possui um registro de vacina.");
 		} 
 	}
 	

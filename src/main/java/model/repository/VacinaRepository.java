@@ -143,19 +143,19 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 			if(resultado.next()) {
 				vacina = new Vacina();
 				PaisRepository paisRepository = new PaisRepository();
-				PessoaRepository pessoaRepository = new PessoaRepository();
+				// PessoaRepository pessoaRepository = new PessoaRepository();
 				vacina.setIdVacina(resultado.getInt("id_Vacina"));
 				vacina.setNome(resultado.getString("nome"));
 				vacina.setEstagioDaVacina(resultado.getInt("estagio_Da_Pesquisa"));
 				vacina.setDataInicioPesquisa(resultado.getDate("dataInicioDaPesquisa").toLocalDate());
 				
 				// FUNCIONAVA SEM LOOPING DESSA FORMA
-				//Pessoa pesquisadorResponsavelPelaVacina = new Pessoa();
-				//pesquisadorResponsavelPelaVacina.setIdPessoa((resultado.getInt("id_Pesquisador")));
+				Pessoa pesquisadorResponsavelPelaVacina = new Pessoa();
+				pesquisadorResponsavelPelaVacina.setIdPessoa((resultado.getInt("id_Pesquisador")));
 				
-				// DESSA FORMA ENTRA EM LOOPING
-				Pessoa pesquisadorResponsavelPelaVacina = pessoaRepository.consultarPorId(resultado.getInt("id_Pesquisador"));
-				vacina.setPesquisadorResponsavel(pesquisadorResponsavelPelaVacina);
+				 //DESSA FORMA ENTRA EM LOOPING
+				//Pessoa pesquisadorResponsavelPelaVacina = pessoaRepository.consultarPorId(resultado.getInt("id_Pesquisador"));
+				//vacina.setPesquisadorResponsavel(pesquisadorResponsavelPelaVacina);
 				
 				Pais paisDaVacina = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
 				vacina.setPais(paisDaVacina);

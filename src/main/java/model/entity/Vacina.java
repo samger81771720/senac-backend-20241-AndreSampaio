@@ -10,6 +10,7 @@ public class Vacina {
 	private  int estagioDaVacina;
 	private LocalDate dataInicioPesquisa;
 	private Pais pais;
+	private double mediaDaVacina;
 	
 	public Vacina() {
 		super();
@@ -63,4 +64,11 @@ public class Vacina {
 		this.pais = pais;
 	}
 
+	public double getMediaDaVacina() {
+		return mediaDaVacina;
+	}
+
+	public void setMediaDaVacina(double mediaDaVacina) {
+		this.mediaDaVacina = mediaDaVacina;
+	}
 }

@@ -1,15 +1,39 @@
+
+
 -- drop database if exists VACINACAO;
 
 create schema if not exists VACINACAO;
 
 use VACINACAO;
 
+create table if not exists vacinacao.pais(
+	id_Pais integer auto_increment not null,
+	nome varchar(100),
+	sigla varchar(100),
+	constraint PAIS_pk primary key(id_Pais)
+);
 
-create table if not exists VACINACAO.PAIS(
-id_Pais integer auto_increment not null,
-nome varchar (255) unique not null,
-sigla varchar(20) unique not null,
-constraint PAIS_pk primary key(id_Pais)
+create table if not exists VACINACAO.PESSOA(
+	id_Pessoa integer auto_increment not null,
+	tipo integer not null comment '1 - Pesquisador, 2- Voluntário, 3 - Público Geral',
+	nome varchar(255) not null,
+	dataNascimento date not null,
+	sexo char(1) not null,
+	cpf varchar(11) unique not null,
+	constraint PESSOA_pk primary key(id_Pessoa)
+);
+
+drop database if exists VACINACAO;
+
+create schema if not exists VACINACAO;
+
+use VACINACAO;
+
+create table if not exists vacinacao.pais(
+	id_Pais integer auto_increment not null,
+	nome varchar(100),
+	sigla varchar(100),
+	constraint PAIS_pk primary key(id_Pais)
 );
 
 create table if not exists VACINACAO.PESSOA(
@@ -21,21 +45,21 @@ create table if not exists VACINACAO.PESSOA(
 	sexo char(1) not null,
 	cpf varchar(11) unique not null,
 	constraint PESSOA_pk primary key(id_Pessoa),
-	constraint PAIS_fk_pessoa foreign key (id_Pais) references VACINACAO.PAIS(id_Pais)
+	constraint PAIS_fk foreign key(id_Pais) references VACINACAO.PAIS(id_Pais)
 );
 
 create table if not exists VACINACAO.VACINA(
-	id_Vacina integer auto_increment not null,
-	id_Pesquisador integer not null,
-	id_Pais integer not null,
-	nome varchar(255) not null,
-	estagio_Da_Pesquisa integer not null comment '1 - Inicial, 2 - Testes, 3 - Aplicação em Massa',
-	dataInicioDaPesquisa date not null,
-	constraint VACINA_pk primary key(id_Vacina),
-	constraint PESQUISADOR_fk foreign key(id_Pesquisador) references VACINACAO.PESSOA(id_Pessoa),
-	constraint PAIS_fk_vacina foreign key(id_Pais) references VACINACAO.PAIS(id_Pais)
+    id_Vacina integer auto_increment not null,
+    id_Pesquisador integer not null,
+    id_Pais integer not null,
+    nome varchar(255) not null,
+    estagio_Da_Pesquisa integer not null comment '1 - Inicial, 2 - Testes, 3 - Aplicação em Massa',
+    dataInicioDaPesquisa date not null,
+    constraint VACINA_pk primary key(id_Vacina),
+    constraint PESQUISADOR_fk foreign key(id_Pesquisador) references VACINACAO.PESSOA(id_Pessoa),
+    constraint PAIS2_fk foreign key(id_Pais) references VACINACAO.PAIS(id_Pais)
 );
-	
+
 create table if not exists VACINACAO.APLICACAO_VACINA(
 	id_Aplicacao integer auto_increment not null,
 	id_Pessoa integer not null,
@@ -44,237 +68,34 @@ create table if not exists VACINACAO.APLICACAO_VACINA(
 	avaliacaoDaReacao integer not null comment '1 = Péssima à 5 = Ótima',
 	constraint APLICACAO_pk primary key(id_Aplicacao),
 	constraint PESSOA_fk foreign key(id_Pessoa) references VACINACAO.PESSOA(id_Pessoa),
-	constraint VACINA_fk foreign key(id_Vacina) references VACINACAO.VACINA(id_Vacina) 
+	constraint VACINA_fk foreign key(id_Vacina) references VACINACAO.VACINA(id_Vacina)
 );
 
 
-INSERT INTO VACINACAO.PAIS (nome, sigla) VALUES
-('Afeganistão', 'AF'),
-('Albânia', 'AL'),
-('Argélia', 'DZ'),
-('Andorra', 'AD'),
-('Angola', 'AO'),
-('Antígua e Barbuda', 'AG'),
-('Argentina', 'AR'),
-('Armênia', 'AM'),
-('Austrália', 'AU'),
-('Áustria', 'AT'),
-('Azerbaijão', 'AZ'),
-('Bahamas', 'BS'),
-('Bahrein', 'BH'),
-('Bangladesh', 'BD'),
-('Barbados', 'BB'),
-('Bielorrússia', 'BY'),
-('Bélgica', 'BE'),
-('Belize', 'BZ'),
-('Benin', 'BJ'),
-('Butão', 'BT'),
-('Bolívia', 'BO'),
-('Bósnia e Herzegovina', 'BA'),
-('Botsuana', 'BW'),
-('Brasil', 'BR'),
-('Brunei', 'BN'),
-('Bulgária', 'BG'),
-('Burkina Faso', 'BF'),
-('Burundi', 'BI'),
-('Cabo Verde', 'CV'),
-('Camboja', 'KH'),
-('Camarões', 'CM'),
-('Canadá', 'CA'),
-('República Centro-Africana', 'CF'),
-('Chade', 'TD'),
-('Chile', 'CL'),
-('China', 'CN'),
-('Colômbia', 'CO'),
-('Comores', 'KM'),
-('República Democrática do Congo', 'CD'),
-('República do Congo', 'CG'),
-('Costa Rica', 'CR'),
-('Croácia', 'HR'),
-('Cuba', 'CU'),
-('Chipre', 'CY'),
-('República Tcheca', 'CZ'),
-('Dinamarca', 'DK'),
-('Djibuti', 'DJ'),
-('Dominica', 'DM'),
-('República Dominicana', 'DO'),
-('Timor-Leste', 'TL'),
-('Equador', 'EC'),
-('Egito', 'EG'),
-('El Salvador', 'SV'),
-('Guiné Equatorial', 'GQ'),
-('Eritreia', 'ER'),
-('Estônia', 'EE'),
-('Eswatini', 'SZ'),
-('Etiópia', 'ET'),
-('Fiji', 'FJ'),
-('Finlândia', 'FI'),
-('França', 'FR'),
-('Gabão', 'GA'),
-('Gâmbia', 'GM'),
-('Geórgia', 'GE'),
-('Alemanha', 'DE'),
-('Gana', 'GH'),
-('Grécia', 'GR'),
-('Granada', 'GD'),
-('Guatemala', 'GT'),
-('Guiné', 'GN'),
-('Guiné-Bissau', 'GW'),
-('Guiana', 'GY'),
-('Haiti', 'HT'),
-('Honduras', 'HN'),
-('Hungria', 'HU'),
-('Islândia', 'IS'),
-('Índia', 'IN'),
-('Indonésia', 'ID'),
-('Irã', 'IR'),
-('Iraque', 'IQ'),
-('Irlanda', 'IE'),
-('Israel', 'IL'),
-('Itália', 'IT'),
-('Costa do Marfim', 'CI'),
-('Jamaica', 'JM'),
-('Japão', 'JP'),
-('Jordânia', 'JO'),
-('Cazaquistão', 'KZ'),
-('Quênia', 'KE'),
-('Kiribati', 'KI'),
-('Coreia do Norte', 'KP'),
-('Coreia do Sul', 'KR'),
-('Kuwait', 'KW'),
-('Quirguistão', 'KG'),
-('Laos', 'LA'),
-('Letônia', 'LV'),
-('Líbano', 'LB'),
-('Lesoto', 'LS'),
-('Libéria', 'LR'),
-('Líbia', 'LY'),
-('Liechtenstein', 'LI'),
-('Lituânia', 'LT'),
-('Luxemburgo', 'LU'),
-('Madagascar', 'MG'),
-('Malaui', 'MW'),
-('Malásia', 'MY'),
-('Maldivas', 'MV'),
-('Mali', 'ML'),
-('Malta', 'MT'),
-('Ilhas Marshall', 'MH'),
-('Mauritânia', 'MR'),
-('Maurícia', 'MU'),
-('México', 'MX'),
-('Micronésia', 'FM'),
-('Moldávia', 'MD'),
-('Mônaco', 'MC'),
-('Mongólia', 'MN'),
-('Montenegro', 'ME'),
-('Marrocos', 'MA'),
-('Moçambique', 'MZ'),
-('Mianmar', 'MM'),
-('Namíbia', 'NA'),
-('Nauru', 'NR'),
-('Nepal', 'NP'),
-('Países Baixos', 'NL'),
-('Nova Zelândia', 'NZ'),
-('Nicarágua', 'NI'),
-('Níger', 'NE'),
-('Nigéria', 'NG'),
-('Niue', 'NU'),
-('Macedônia do Norte', 'MK'),
-('Noruega', 'NO'),
-('Omã', 'OM'),
-('Paquistão', 'PK'),
-('Palau', 'PW'),
-('Panamá', 'PA'),
-('Papua Nova Guiné', 'PG'),
-('Paraguai', 'PY'),
-('Peru', 'PE'),
-('Filipinas', 'PH'),
-('Polônia', 'PL'),
-('Portugal', 'PT'),
-('Catar', 'QA'),
-('Romênia', 'RO'),
-('Rússia', 'RU'),
-('Ruanda', 'RW'),
-('São Cristóvão e Nevis', 'KN'),
-('Santa Lúcia', 'LC'),
-('São Vicente e Granadinas', 'VC'),
-('Samoa', 'WS'),
-('San Marino', 'SM'),
-('São Tomé e Príncipe', 'ST'),
-('Arábia Saudita', 'SA'),
-('Senegal', 'SN'),
-('Sérvia', 'RS'),
-('Seychelles', 'SC'),
-('Serra Leoa', 'SL'),
-('Cingapura', 'SG'),
-('Eslováquia', 'SK'),
-('Eslovênia', 'SI'),
-('Ilhas Salomão', 'SB'),
-('Somália', 'SO'),
-('África do Sul', 'ZA'),
-('Sudão do Sul', 'SS'),
-('Espanha', 'ES'),
-('Sri Lanka', 'LK'),
-('Sudão', 'SD'),
-('Suriname', 'SR'),
-('Suécia', 'SE'),
-('Suíça', 'CH'),
-('Síria', 'SY'),
-('Tajiquistão', 'TJ'),
-('Tanzânia', 'TZ'),
-('Tailândia', 'TH'),
-('Togo', 'TG'),
-('Tonga', 'TO'),
-('Trinidad e Tobago', 'TT'),
-('Tunísia', 'TN'),
-('Turquia', 'TR'),
-('Turcomenistão', 'TM'),
-('Tuvalu', 'TV'),
-('Uganda', 'UG'),
-('Ucrânia', 'UA'),
-('Emirados Árabes Unidos', 'AE'),
-('Reino Unido', 'GB'),
-('Estados Unidos', 'US'),
-('Uruguai', 'UY'),
-('Uzbequistão', 'UZ'),
-('Vanuatu', 'VU'),
-('Cidade do Vaticano', 'VA'),
-('Venezuela', 'VE'),
-('Vietnã', 'VN'),
-('Iêmen', 'YE'),
-('Zâmbia', 'ZM'),
-('Zimbábue', 'ZW');
+
+INSERT INTO VACINACAO.pais (nome, sigla) VALUES
+('Brazil', 'BR'),
+('United States', 'US'),
+('Canada', 'CA'),
+('United Kingdom', 'UK'),
+('Germany', 'DE'),
+('France', 'FR'),
+('Italy', 'IT'),
+('Spain', 'ES'),
+('Japan', 'JP'),
+('Australia', 'AU');
 
 
 INSERT INTO VACINACAO.PESSOA (id_Pais, tipo, nome, dataNascimento, sexo, cpf) VALUES
-(11, 1, 'João', '1990-05-15', 'M', '12345678901'),
-(55, 3, 'Maria', '1985-08-20', 'F', '23456789012'),
-(23, 3, 'Carlos', '1978-02-10', 'M', '34567890123'),
-(40, 1, 'Ana', '1995-11-25', 'F', '45678901234'),
-(22, 2, 'Paulo', '2000-03-30', 'M', '56789012345');
+(1, 1, 'João Silva', '1990-05-15', 'M', '12345678901'),
+(2, 2, 'Maria Santos', '1985-10-25', 'F', '05425789653'),
+(3, 3, 'aNDRÉ sAMPAIO', '1980-11-27', 'm', '05157892756');
 
-INSERT INTO VACINACAO.VACINA (id_Pesquisador, id_Pais, nome, estagio_Da_Pesquisa, dataInicioDaPesquisa) VALUES
-(5, 99, 'Vacina 1', 1, '2023-01-15'),
-(2, 150, 'Vacina 2', 2, '2023-03-20'),
-(3, 20, 'Vacina 3', 1, '2023-05-10'),
-(4, 70, 'Vacina 4', 3, '2023-07-05'),
-(1, 103, 'Vacina 5', 2, '2023-09-12'),
-(1, 55, 'Vacina 2', 3, '2023-10-11');
+insert into VACINACAO.VACINA (id_Pesquisador,id_Pais,nome,estagio_Da_Pesquisa,dataInicioDaPesquisa)values(1,1,'VACINA 1',1,'2024-03-02');
+insert into VACINACAO.VACINA (id_Pesquisador,id_Pais,nome,estagio_Da_Pesquisa,dataInicioDaPesquisa)values(1,2,'VACINA 2',2,'2024-03-01');
+insert into VACINACAO.VACINA (id_Pesquisador,id_Pais,nome,estagio_Da_Pesquisa,dataInicioDaPesquisa)values(1,3,'VACINA 3',3,'2024-01-02');
 
 INSERT INTO VACINACAO.APLICACAO_VACINA (id_Pessoa, id_Vacina, dataAplicacao, avaliacaoDaReacao) VALUES
-(3, 1, '2023-02-01', 4),
-(1, 2, '2023-04-10', 5),
-(2, 3, '2023-06-20', 3),
-(5, 4, '2023-08-15', 2),
-(4, 5, '2023-10-25', 5),
-(4, 5, '2023-10-24', 4),
-(4, 5, '2023-10-23', 3),
-(4, 5, '2023-10-22', 2),
-(4, 5, '2023-10-21', 1);
-
-
-
-select * from VACINACAO.PAIS;
-select * from VACINACAO.PESSOA;
-select * from VACINACAO.VACINA;
-select * from VACINACAO.APLICACAO_VACINA;
+(1, 1, '2024-03-01', 5),
+(2, 2, '2024-03-02', 4),
+(3, 3, '2024-03-03', 3);

@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import model.entity.Aplicacao;
+import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;
 
@@ -193,6 +194,28 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 			Banco.closeConnection(conn);
 		}
 		return aplicacoesDaPessoa;
+	}
+	
+	public boolean validarAplicacaoDeVacinaPorId(int id) {
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		boolean aplicou = false;
+		String query="select * from VACINACAO.APLICACAO_VACINA where id_Vacina =  "+id;
+		try {
+			resultado = stmt.executeQuery(query);
+			if(resultado.next()) {
+				aplicou = true;
+			}
+		} catch (SQLException erro) {
+			System.out.println("Erro ao tentar verificar se vacina de id "+id+" foi aplicada.");
+			System.out.println("Erro: "+erro.getMessage());
+		} finally {
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return aplicou;
 	}
 
 }
