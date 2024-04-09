@@ -78,7 +78,8 @@ public class AplicacaoService {
 	//- Ao aplicar uma dose de vacina (inserir/atualizar vacinação), o sistema deve verificar se a pessoa pode
 		// receber a vacina em questão, consoante a seguinte regra 
 		private void validarPermissaoParaVacinar(Aplicacao novoRegistroDaAplicacaoDaVacina) throws ControleVacinasException{
-			if(vacinaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getVacinaAplicada().getIdVacina()).getEstagioDaVacina() ==INICIAL  && 
+			if(vacinaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getVacinaAplicada().getIdVacina()).getEstagioDaVacina() ==INICIAL 
+					&& 
 					pessoaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getIdPessoa()).getIdPessoa()!=PESQUISADOR ){ 
 				throw new ControleVacinasException("No estágio inicial da vacina, apenas os pesquisadores podem ser vacinados.");
 			}
