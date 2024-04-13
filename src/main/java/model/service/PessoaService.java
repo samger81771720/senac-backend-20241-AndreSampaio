@@ -23,6 +23,7 @@ package model.service;
 import java.util.List;
 import exception.ControleVacinasException;
 import model.entity.Pessoa;
+import model.repository.AplicacaoRepository;
 import model.repository.PessoaRepository;
 
 public class PessoaService {
@@ -33,18 +34,20 @@ public class PessoaService {
 	private static final int VOLUNTARIO = 2 ;
 	private static final int PUBLICO_GERAL = 3;
 	
-	private PessoaRepository repository = new PessoaRepository();
+	private PessoaRepository pessoaRepository = new PessoaRepository();
+	
+	private AplicacaoRepository aplicacaoRepository = new AplicacaoRepository();
 	
 	// OK!
 	public Pessoa salvar(Pessoa novaPessoa) throws ControleVacinasException{
 		validarPessoaParaCadastro(novaPessoa);
-		return repository.salvar(novaPessoa);
+		return pessoaRepository.salvar(novaPessoa);
 	}
 	
 	
 	public boolean alterar(Pessoa pessoaParaAlterar) throws ControleVacinasException{
 		validarPessoaParaAtualizarCadastro(pessoaParaAlterar);
-		return repository.alterar(pessoaParaAlterar);
+		return pessoaRepository.alterar(pessoaParaAlterar);
 	}
 	
 	/**
@@ -78,13 +81,13 @@ public class PessoaService {
 	 */
 	// OK !
 	private void verificar_CPF_Para_Cadastro(Pessoa pessoa) throws ControleVacinasException{
-       if(repository.verificar_CPF_Para_Cadastro(pessoa)!=false) {
+       if(pessoaRepository.verificar_CPF_Para_Cadastro(pessoa)!=false) {
         	throw new ControleVacinasException("O cpf "+pessoa.getCpf()+" de "+pessoa.getNome()+" já se encontra cadastrado no sistema.");
         } 
 	}
 	//OK !
 	private void verificar_CPF_Para_Atualizar(Pessoa novaPessoa) throws ControleVacinasException{
-	       if(repository.verificar_CPF_Para_Atualizar(novaPessoa)!=true) {
+	       if(pessoaRepository.verificar_CPF_Para_Atualizar(novaPessoa)!=true) {
 	        	throw new ControleVacinasException("Não é possível alterar o número de cpf no cadastro.");
 	        } 
 	}
@@ -153,27 +156,27 @@ public class PessoaService {
 	public boolean excluir(int id) throws ControleVacinasException{
 		verificarSeTomouPrimeiraDose(id); 
 
-		return repository.excluir(id);
+		return pessoaRepository.excluir(id);
 	}
 	
 	// Pessoa não pode ser excluída caso já tenha recebido pelo menos uma dose vacina; 
 	private void verificarSeTomouPrimeiraDose(int id) throws ControleVacinasException {
-		if(repository.verificarSePessoaFoiVacinada(id)) {
-			throw new ControleVacinasException("Não é possível excluir a pessoa, pois já possui um registro de vacina.");
+		if(aplicacaoRepository.consultarTodasAplicacoesDaPessoa(id).size()>0) {
+			throw new ControleVacinasException("Não é possível excluir a pessoa, pois já possui um registro de vacina, ok?");
 		} 
 	}
 	
 	// OK - FUNCIONANDO!
 	public Pessoa consultarPorId(int id) throws ControleVacinasException{
-		if(repository.consultarPorId(id)==null) {
+		if(pessoaRepository.consultarPorId(id)==null) {
 			throw new ControleVacinasException("Não foi possível encontrar a pessoa com o id informado.");
 		}
-		return repository.consultarPorId(id);
+		return pessoaRepository.consultarPorId(id);
 	}
 	
 	// OK - FUNCIONANDO!
 	public List<Pessoa> consultarTodos() {
-		return repository.consultarTodos();
+		return pessoaRepository.consultarTodos();
 	}
 
 }

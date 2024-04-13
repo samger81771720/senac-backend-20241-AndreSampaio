@@ -125,28 +125,6 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		 pstmt.setString(6, novaPessoa.getCpf());
 	}
 	
-	public boolean verificarSePessoaFoiVacinada(int id) {
-		Connection conn = Banco.getConnection();
-		Statement stmt = Banco.getStatement(conn);
-		ResultSet resultado = null;
-		boolean recebeu = false;
-		String query="select * from VACINACAO.APLICACAO_VACINA where VACINACAO.APLICACAO_VACINA.id_Pessoa = "+id;
-		try {
-			resultado = stmt.executeQuery(query);
-			if(resultado.next()) {
-				recebeu = true;
-			}
-		} catch (SQLException erro) {
-			System.out.println("Erro ao tentar consultar a(s) aplicação(s) da pessoa de id "+id);
-			System.out.println("Erro: "+erro.getMessage());
-		} finally {
-			Banco.closeResultSet(resultado);
-			Banco.closeStatement(stmt);
-			Banco.closeConnection(conn);
-		}
-		return recebeu;
-	}
-		
 	@Override
 	public boolean excluir(int id) {
 		Connection conn = Banco.getConnection();

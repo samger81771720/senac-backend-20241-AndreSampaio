@@ -1,35 +1,8 @@
-
-
--- ddrop database if exists VACINACAO;
-
 create schema if not exists VACINACAO;
 
 use VACINACAO;
 
-create table if not exists vacinacao.pais(
-	id_Pais integer auto_increment not null,
-	nome varchar(100),
-	sigla varchar(100),
-	constraint PAIS_pk primary key(id_Pais)
-);
-
-create table if not exists VACINACAO.PESSOA(
-	id_Pessoa integer auto_increment not null,
-	tipo integer not null comment '1 - Pesquisador, 2- Voluntário, 3 - Público Geral',
-	nome varchar(255) not null,
-	dataNascimento date not null,
-	sexo char(1) not null,
-	cpf varchar(11) unique not null,
-	constraint PESSOA_pk primary key(id_Pessoa)
-);
-
-drop database if exists VACINACAO;
-
-create schema if not exists VACINACAO;
-
-use VACINACAO;
-
-create table if not exists vacinacao.pais(
+create table if not exists VACINACAO.PAIS(
 	id_Pais integer auto_increment not null,
 	nome varchar(100),
 	sigla varchar(100),
@@ -71,7 +44,7 @@ create table if not exists VACINACAO.APLICACAO_VACINA(
 	constraint VACINA_fk foreign key(id_Vacina) references VACINACAO.VACINA(id_Vacina)
 );
 
-
+ALTER TABLE VACINACAO.VACINA ADD COLUMN mediaVacina decimal(5,2);
 
 INSERT INTO VACINACAO.pais (nome, sigla) VALUES
 ('Brazil', 'BR'),
@@ -89,13 +62,25 @@ INSERT INTO VACINACAO.pais (nome, sigla) VALUES
 INSERT INTO VACINACAO.PESSOA (id_Pais, tipo, nome, dataNascimento, sexo, cpf) VALUES
 (1, 1, 'João Silva', '1990-05-15', 'M', '12345678901'),
 (2, 2, 'Maria Santos', '1985-10-25', 'F', '05425789653'),
-(3, 3, 'aNDRÉ sAMPAIO', '1980-11-27', 'm', '05157892756');
+(3, 3, 'ANDRÉ SAMPAIO', '1980-11-27', 'm', '05157892756'),
+(4, 1, 'Amarante Jordão', '1992-05-15', 'M', '12345678909'),
+(5, 2, 'JOÃO MEDEIROS', '1981-12-26', 'm', '98765432102');
+ 
 
-insert into VACINACAO.VACINA (id_Pesquisador,id_Pais,nome,estagio_Da_Pesquisa,dataInicioDaPesquisa)values(1,1,'VACINA 1',1,'2024-03-02');
-insert into VACINACAO.VACINA (id_Pesquisador,id_Pais,nome,estagio_Da_Pesquisa,dataInicioDaPesquisa)values(1,2,'VACINA 2',2,'2024-03-01');
-insert into VACINACAO.VACINA (id_Pesquisador,id_Pais,nome,estagio_Da_Pesquisa,dataInicioDaPesquisa)values(1,3,'VACINA 3',3,'2024-01-02');
+
+insert into VACINACAO.VACINA (id_Pesquisador,id_Pais,nome,estagio_Da_Pesquisa,dataInicioDaPesquisa)values
+(1,1,'VACINA 1',1,'2024-03-02'),
+(4,2,'VACINA 2',2,'2024-03-01'),
+(1,3,'VACINA 3',3,'2024-01-12'),
+(4,4,'VACINA 4',2,'1900-09-09'),
+(1,5,'VACINA 5',1,'1903-03-03');
+
 
 INSERT INTO VACINACAO.APLICACAO_VACINA (id_Pessoa, id_Vacina, dataAplicacao, avaliacaoDaReacao) VALUES
 (1, 1, '2024-03-01', 5),
 (2, 2, '2024-03-02', 4),
-(3, 3, '2024-03-03', 3);
+(3, 3, '2024-03-03', 3),
+(4, 4, '2024-03-04', 2),
+(5, 5, '2024-03-05', 1);
+
+

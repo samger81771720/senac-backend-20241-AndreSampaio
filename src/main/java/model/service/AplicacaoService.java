@@ -79,13 +79,12 @@ public class AplicacaoService {
 		// receber a vacina em questão, consoante a seguinte regra 
 		private void validarPermissaoParaVacinar(Aplicacao novoRegistroDaAplicacaoDaVacina) throws ControleVacinasException{
 			if(vacinaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getVacinaAplicada().getIdVacina()).getEstagioDaVacina() ==INICIAL 
-					&& 
-					pessoaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getIdPessoa()).getIdPessoa()!=PESQUISADOR ){ 
+					&& 	pessoaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getIdPessoa()).getTipo()!=PESQUISADOR ){ 
 				throw new ControleVacinasException("No estágio inicial da vacina, apenas os pesquisadores podem ser vacinados.");
 			}
 			if(vacinaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getVacinaAplicada().getIdVacina()).getEstagioDaVacina()==TESTES 
 					&&pessoaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getIdPessoa()).getIdPessoa()!=PESQUISADOR 
-					&& pessoaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getIdPessoa()).getIdPessoa()!=PESQUISADOR_OU_VOLUNTARIO ) {
+					&& pessoaRepository.consultarPorId(novoRegistroDaAplicacaoDaVacina.getIdPessoa()).getTipo()!=PESQUISADOR_OU_VOLUNTARIO ) {
 				throw new ControleVacinasException("No estágio de testes da vacina, apenas os pesquisadores ou voluntários podem ser vacinados.");
 			}
 		}

@@ -73,14 +73,14 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 		String query = "select * from VACINACAO.APLICACAO_VACINA where id_Vacina = " + id;
 		try{
 			resultado = stmt.executeQuery(query);
-			double somatorioDasAvalaiacoes = 0;
+			double somatorioDasAvaliacoes = 0;
 			double contagemDasAvaliacoes=0;
 			while(resultado.next()){
 				Aplicacao aplicacao = new Aplicacao();
 				aplicacao.setAvaliacaoReacao(resultado.getInt("avaliacaoDaReacao"));
-				somatorioDasAvalaiacoes += aplicacao.getAvaliacaoReacao();
+				somatorioDasAvaliacoes += aplicacao.getAvaliacaoReacao();
 				contagemDasAvaliacoes ++;
-				mediaDeAvaliacaoDaVacina = somatorioDasAvalaiacoes/contagemDasAvaliacoes;
+				mediaDeAvaliacaoDaVacina = somatorioDasAvaliacoes/contagemDasAvaliacoes;
 			}
 		} catch (SQLException erro){
 			System.out.println("Erro ao executar o cálculo de média das avaliações da vacina.");
@@ -113,7 +113,6 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 		return excluiu; 
 	}
 	
-	//FALTA CRIAR OUTRO MÉTODO PARA CALCULAR APÓS ATUALIZAR
 	@Override
 	public boolean alterar(Aplicacao registroDaAplicacaoDaVacinaAlterado) {
 		boolean alterou = false;
@@ -131,9 +130,9 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 		try {
 			preencherParametrosParaUpdate(pstmt, registroDaAplicacaoDaVacinaAlterado);
 			alterou = pstmt.executeUpdate() > 0;
-			/*if(alterou) {
+			if(alterou) {
 				salvarMediaDeAvaliacaoDaVacina(registroDaAplicacaoDaVacinaAlterado.getVacinaAplicada().getIdVacina());
-			}*/
+			}
 		}catch (Exception erro) {
 			System.out.println("Erro na tentaiva de atualizar o registro da aplicação da vacina.");
 			System.out.println("Erro: "+ erro);
@@ -143,8 +142,6 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 		}
 		return alterou;
 	}
-	
-	
 	
 	private void preencherParametrosParaUpdate(PreparedStatement pstmt, Aplicacao registroDaAplicacaoDaVacinaAlterado) throws SQLException {
 		pstmt.setInt(1, registroDaAplicacaoDaVacinaAlterado.getIdPessoa());
