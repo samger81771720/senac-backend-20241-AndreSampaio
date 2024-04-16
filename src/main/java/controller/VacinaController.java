@@ -16,52 +16,61 @@ import jakarta.ws.rs.core.MediaType;
 import model.entity.Aplicacao;
 import model.entity.Pessoa;
 import model.entity.Vacina;
+import model.seletor.VacinaSeletor;
 import model.service.VacinaService;
 
 @Path("/vacina")
 public class VacinaController {
 	
-	private VacinaService service = new VacinaService();
+	private VacinaService vacinaService = new VacinaService();
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Vacina Salvar(Vacina novaVacina) throws ControleVacinasException{
-		return service.salvar(novaVacina);
+		return vacinaService.salvar(novaVacina);
 	}
 	
 	@GET
 	@Path("/{id}")
 	public Vacina consultarPorId(@PathParam("id")int id){
-		return service.consultarPorId(id);
+		return vacinaService.consultarPorId(id);
 	}
 	
 	@GET
 	@Path("/consultarVacinas")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Vacina> consultarTodos(){
-		 return service.consultarTodos();
+		 return vacinaService.consultarTodos();
 	}
 	
 	@DELETE
 	@Path("/{id}")
 	public boolean excluir(@PathParam("id") int id) throws ControleVacinasException{
-		 return service.excluir(id);
+		 return vacinaService.excluir(id);
 	}
 	
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
 	public boolean alterar(Vacina vacinaParaAlterar) {
-		return service.alterar(vacinaParaAlterar);
+		return vacinaService.alterar(vacinaParaAlterar);
 	}
 	
 	/*@GET
 	@Path("/consultarAplicacoesDaPessoa/{idPessoa}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(@PathParam("idPessoa")int id){
+	public ArrayList<Aplicacao> consultarTodasvaAplicacoesDaPessoa(@PathParam("idPessoa")int id){
 		return service.consultarTodasAplicacoesDaPessoa(id);
 	}*/
-
+	
+	@POST
+	@Path("/filtro")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Vacina> consultarComFitros(VacinaSeletor seletor){
+		return vacinaService.consultarComFiltros(seletor);
+	}
+	
 }

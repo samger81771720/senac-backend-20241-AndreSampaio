@@ -8,10 +8,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import com.mysql.cj.xdevapi.Result;
+
 import model.entity.Aplicacao;
 import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;
+import model.seletor.VacinaSeletor;
 
 public class VacinaRepository implements BaseRepository<Vacina>{
 	
@@ -201,6 +204,65 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 		} catch (SQLException erro){
 			System.out.println("Erro ao executar consultar todas as vacinas.");
 			System.out.println("Erro: " + erro.getMessage());
+		} finally {
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return vacinas;
+	}
+	
+	public ArrayList<Vacina> consultarComFiltros(VacinaSeletor seletor){
+		ArrayList<Vacina>vacinas = new ArrayList<Vacina>();
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		/* 
+		  O operador LIKE no SQL é utilizado para fazer comparações de padrões em strings.
+		   Além disso, você pode usar o '%' em outras posições para representar qualquer 
+		   quantidade de caracteres antes ou depois do padrão que você está procurando. 
+		  */
+		String query = "select v.* from VACINACAO.VACINA v\r\n"
+				+ "inner join VACINACAO.PAIS p on v.id_Pais = p.id_Pais \r\n"
+				+ "inner join VACINACAO.PESSOA pe on pe.id_Pessoa = v.id_Pesquisador";
+		boolean primeiro = true;
+		if(seletor.getNomeVacina() != null) {
+			if(primeiro) {
+				query +=  " WHERE ";
+			} else {
+				query += " AND ";
+			}
+			query += " upper(v.nome) LIKE  UPPER ('%" + seletor.getNomeVacina() + "%') ";
+			primeiro =false;
+		}
+		if(seletor.getNomePais() != null) {
+			if(primeiro) {
+				query += " WHERE "; 
+			} else {
+				query += " AND ";
+			}
+			query +=  " UPPER (p.nome) LIKE UPPER (' %" +  seletor.getNomePais() + "%')";
+		}
+		try {
+			resultado = stmt.executeQuery(query);
+			while(resultado.next()) {
+				Vacina vacina = new Vacina();
+				vacina.setIdVacina(resultado.getInt("id_Vacina"));
+				vacina.setNome(resultado.getString("nome"));
+				vacina.setEstagioDaVacina(resultado.getInt("estagio_Da_Pesquisa"));
+				vacina.setMediaDaVacina(resultado.getDouble("mediaVacina"));
+				PessoaRepository pessoaRepository = new PessoaRepository();
+				Pessoa pesquisador = pessoaRepository.consultarPorId(resultado.getInt("id_Pesquisador"));
+				vacina.setPesquisadorResponsavel(pesquisador);
+				PaisRepository paisRepository = new PaisRepository();
+				Pais paisDaVacina = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
+				vacina.setPais(paisDaVacina);
+				vacina.setDataInicioPesquisa(resultado.getDate("dataInicioDaPesquisa").toLocalDate());
+				vacinas.add(vacina);
+			}
+		} catch(SQLException erro){
+			System.out.println("Erro ao consultar todas as vacinas.");
+			System.out.println("Erro"+erro.getMessage());
 		} finally {
 			Banco.closeResultSet(resultado);
 			Banco.closeStatement(stmt);

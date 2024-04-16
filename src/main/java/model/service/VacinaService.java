@@ -8,39 +8,40 @@ import model.entity.Vacina;
 import model.repository.AplicacaoRepository;
 import model.repository.PessoaRepository;
 import model.repository.VacinaRepository;
+import model.seletor.VacinaSeletor;
 
 public class VacinaService {
 	
 	private static final int PESQUISADOR = 1;
 	
-	private VacinaRepository repository = new VacinaRepository();
+	private VacinaRepository vacinaRepository = new VacinaRepository();
 	
 	private AplicacaoRepository aplicacaoRepository = new AplicacaoRepository(); 
 	
 	public Vacina salvar(Vacina novaVacina) throws ControleVacinasException{
 		validarPesquisador(novaVacina);
-		return repository.salvar(novaVacina);
+		return vacinaRepository.salvar(novaVacina);
 	}
 	
 	public Vacina consultarPorId(int id) {
-		return repository.consultarPorId(id);
+		return vacinaRepository.consultarPorId(id);
 	}
 	
 	public ArrayList<Vacina> consultarTodos() {
-		return repository.consultarTodos();
+		return vacinaRepository.consultarTodos();
 	}
 	
 	public boolean excluir(int id) throws ControleVacinasException{
 		validarAplicacaoDeVacinaPorId(id);
-		return repository.excluir(id);
+		return vacinaRepository.excluir(id);
 	}
 	
 	public boolean alterar(Vacina vacinaParaAlterar) {
-		return repository.alterar(vacinaParaAlterar);
+		return vacinaRepository.alterar(vacinaParaAlterar);
 	}
 	
 	private void validarPesquisador(Vacina vacina) throws ControleVacinasException{
-		if(repository.validarPesquisador(vacina)!=PESQUISADOR) {
+		if(vacinaRepository.validarPesquisador(vacina)!=PESQUISADOR) {
 			throw new ControleVacinasException("O id da pessoa informada para cadastrar essa vacina não é o id de um pesquisador.");
 		}
 	}
@@ -50,5 +51,9 @@ public class VacinaService {
 		if (aplicacaoRepository.validarAplicacaoDeVacinaPorId(id)) {
 			throw new ControleVacinasException("Não é possível excluir a vacina do sistema, pois a mesma já foi aplicada em uma pessoa.");
 		}
+	}
+	
+	public ArrayList<Vacina> consultarComFiltros(VacinaSeletor seletor){
+		return vacinaRepository.consultarComFiltros(seletor);
 	}
 }

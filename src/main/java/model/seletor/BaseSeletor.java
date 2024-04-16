@@ -30,36 +30,34 @@ public abstract class BaseSeletor {
 		return this.limite > 0 && this.pagina > 0;
 	}
 	
-	// Explicação abaixo
+	//"obtenha o deslocamento"
 	public int getOffSet() {
 		return this.limite * (this.pagina - 1);
-	}
+	} 
+	//Explicação abaixo
 	
 }
 
-
 /*
   
- O método getOffset() da classe BaseSeletor é utilizado para calcular o deslocamento (offset) 
- dos registros a serem consultados em uma operação de paginação. Vamos analisar o método 
- linha por linha para entender seu funcionamento:
- 
+ O método getOffSet() é responsável por calcular o deslocamento necessário para uma consulta paginada em um banco de dados.
 
-return this.limite * (this.pagina - 1);
-this.limite se refere à quantidade máxima de registros que devem ser retornados em cada página.
+Vamos entender como ele funciona:
 
-this.pagina é o número da página que está sendo solicitada.
+this.pagina - 1: Isso subtrai 1 do número da página atual. Isso é feito porque, em uma consulta paginada, geralmente as páginas 
+são indexadas a partir de 1 (a primeira página é a página 1), mas em programação, os índices geralmente começam em 0. Portanto, 
+subtrair 1 ajusta a contagem da página para que corresponda ao índice correto.
 
-(this.pagina - 1) é subtraído de this.pagina para ajustar a indexação de página para começar de 0 em vez de 1. 
-Isso é necessário porque a indexação de lista ou array geralmente começa em 0 em muitas linguagens de programação.
+this.limite * (this.pagina - 1): Multiplica o número de itens por página (limite) pelo número da página ajustado. Isso resulta 
+no número de itens que devem ser pulados antes de começar a recuperar os resultados para a página atual.
 
-this.limite * (this.pagina - 1) calcula o número de registros que devem ser pulados (o deslocamento) para chegar à página desejada. 
-Por exemplo, se estivermos na página 1 (this.pagina = 1), o deslocamento será 0, o que significa que não precisamos pular nenhum registro. 
-Se estivermos na página 2 (this.pagina = 2), o deslocamento será this.limite, o que significa que devemos pular this.limite registros
- para alcançar a página 2.
+Por exemplo, se você estiver na página 3 e tiver 10 itens por página, o cálculo seria:
 
-Essencialmente, getOffset() calcula o número de registros que devem ser pulados para alcançar a página desejada, 
-com base no número de registros por página e no número da página. Isso é útil ao construir consultas SQL ou ao 
-trabalhar com outras formas de acesso a dados paginados.
+makefile
+Copy code
+Deslocamento = 10 * (3 - 1) = 10 * 2 = 20
+Isso significa que, para obter os resultados da página 3, você precisa pular os 20 primeiros resultados. 
+Esse é o propósito do método getOffSet(): determinar quantos itens devem ser pulados na consulta para 
+obter os resultados da página desejada.
 
 */
