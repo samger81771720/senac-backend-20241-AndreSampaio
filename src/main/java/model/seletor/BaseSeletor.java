@@ -7,6 +7,7 @@ public abstract class BaseSeletor {
 	
 	public BaseSeletor() {
 		this.pagina = 0;
+		// "this.limite" - Determina o máximo de registros a retornar
 		this.limite = 0;
 	}
 
@@ -30,7 +31,7 @@ public abstract class BaseSeletor {
 		return this.limite > 0 && this.pagina > 0;
 	}
 	
-	//"obtenha o deslocamento"
+	//"Método para localizar o  início do primeiro registro"
 	public int getOffSet() {
 		return this.limite * (this.pagina - 1);
 	} 
@@ -53,8 +54,6 @@ no número de itens que devem ser pulados antes de começar a recuperar os resulta
 
 Por exemplo, se você estiver na página 3 e tiver 10 itens por página, o cálculo seria:
 
-makefile
-Copy code
 Deslocamento = 10 * (3 - 1) = 10 * 2 = 20
 Isso significa que, para obter os resultados da página 3, você precisa pular os 20 primeiros resultados. 
 Esse é o propósito do método getOffSet(): determinar quantos itens devem ser pulados na consulta para 

@@ -1,6 +1,6 @@
 package model.seletor;
 
-public class VacinaSeletor {	
+public class VacinaSeletor extends BaseSeletor{	
 	
 	private String nomePais;
 	private String nomePesquisador;
@@ -32,6 +32,12 @@ public class VacinaSeletor {
 
 	public void setNomeVacina(String nomeVacina) {
 		this.nomeVacina = nomeVacina;
+	}
+	
+	public boolean temFiltro() {
+		return (this.nomePais != null && this.nomePais.trim().length() > 0)
+					|| (this.nomePesquisador != null && this.nomePesquisador.trim().length()>0)
+					|| (this.nomeVacina != null && this.nomeVacina.trim().length() > 0);
 	}
 	
 }

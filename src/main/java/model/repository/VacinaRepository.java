@@ -212,16 +212,16 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 		return vacinas;
 	}
 	
-	public ArrayList<Vacina> consultarComFiltros(VacinaSeletor seletor){
+	/*public ArrayList<Vacina> consultarComFiltros(VacinaSeletor seletor){
 		ArrayList<Vacina>vacinas = new ArrayList<Vacina>();
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
-		/* 
-		  O operador LIKE no SQL é utilizado para fazer comparações de padrões em strings.
-		   Além disso, você pode usar o '%' em outras posições para representar qualquer 
-		   quantidade de caracteres antes ou depois do padrão que você está procurando. 
-		  */
+		
+		  //O operador LIKE no SQL é utilizado para fazer comparações de padrões em strings.
+		   //Além disso, você pode usar o '%' em outras posições para representar qualquer 
+		   //quantidade de caracteres antes ou depois do padrão que você está procurando. 
+		
 		String query = "select v.* from VACINACAO.VACINA v\r\n"
 				+ "inner join VACINACAO.PAIS p on v.id_Pais = p.id_Pais \r\n"
 				+ "inner join VACINACAO.PESSOA pe on pe.id_Pessoa = v.id_Pesquisador";
@@ -232,7 +232,7 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 			} else {
 				query += " AND ";
 			}
-			query += " upper(v.nome) LIKE  UPPER ('%" + seletor.getNomeVacina() + "%') ";
+			query += " UPPER(v.nome) LIKE  UPPER ('%" + seletor.getNomeVacina() + "%') ";
 			primeiro =false;
 		}
 		if(seletor.getNomePais() != null) {
@@ -269,6 +269,89 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 			Banco.closeConnection(conn);
 		}
 		return vacinas;
+	}*/
+	
+	public ArrayList<Vacina> consultarComFiltros(VacinaSeletor seletor){
+		ArrayList<Vacina> vacinas = new ArrayList<Vacina>();
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		String sql = 	"select v.* from VACINACAO.VACINA "
+								+ "inner join VACINACAO.PAIS p on v.id_Pais = p.id_Pais "
+								+ "inner join VACINACAO.PESSOA pe on pe.id_Pessoa = v.id_Pesquisador";
+		if(seletor.temFiltro()) {
+			sql = preencherFiltros(seletor,sql);
+		}
+		try {
+			resultado = stmt.executeQuery(sql);
+			while(resultado.next()) {
+				Vacina vacina = construirDoResultSet(resultado);
+				vacinas.add(vacina);
+			}
+		} catch(SQLException erro){
+			System.out.println("Erro durante a execução do método \"consultarComSeletor\" ao consultar as vacinas do filtro selecionado.");
+			System.out.println("Erro: "+erro.getMessage());
+		} finally{
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return vacinas;
 	}
+	
+	private String preencherFiltros(VacinaSeletor seletor, String sql) {
+		// Tem pelo menos um filtro
+		sql += " WHERE ";
+		boolean primeiro = true;
+		if(seletor.getNomeVacina() != null && seletor.getNomeVacina().trim().length() > 0) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " UPPER(v.nome) LIKE UPPER ('%"+seletor.getNomeVacina()+"%')";
+			primeiro = false;
+		}
+		if(seletor.getNomePesquisador() != null && seletor.getNomePesquisador().trim().length()>0) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql = " UPPER(pe.nome)LIKE UPPER('%"+seletor.getNomePesquisador()+"%')";
+		}
+		if(seletor.getNomePais() != null && seletor.getNomePais().trim().length()>0) {
+			if(!primeiro) {
+				sql = " AND ";
+			}
+			sql = " UPPER(p.nome)like UPPER('%"+seletor.getNomePais()+"%')";
+		}
+		return sql;
+	}
+	
+	private Vacina construirDoResultSet(ResultSet resultado) throws SQLException{
+		Vacina vacina = new Vacina();
+		vacina.setIdVacina(resultado.getInt("id_Vacina"));
+		vacina.setNome(resultado.getString("nome"));
+		if(resultado.getDate("dataInicioDaPesquisa") != null) {
+			vacina.setDataInicioPesquisa(resultado.getDate("dataInicioDaPesquisa").toLocalDate());	
+		}
+		vacina.setEstagioDaVacina(resultado.getInt("estagio_Da_Pesquisa"));
+		vacina.setMediaDaVacina(resultado.getDouble("mediaVacina"));
+		PaisRepository paisRepository = new PaisRepository();
+		Pais paisDaVacina = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
+		vacina.setPais(paisDaVacina);
+		PessoaRepository pessoaRepository = new PessoaRepository();
+		Pessoa pesquisadorResponsavel = pessoaRepository.consultarPorId(resultado.getInt("id_Pesquisador"));
+		vacina.setPesquisadorResponsavel(pesquisadorResponsavel);
+		return vacina;
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 }
