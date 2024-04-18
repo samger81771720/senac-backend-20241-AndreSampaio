@@ -276,9 +276,7 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
-		String sql = 	"select v.* from VACINACAO.VACINA "
-								+ "inner join VACINACAO.PAIS p on v.id_Pais = p.id_Pais "
-								+ "inner join VACINACAO.PESSOA pe on pe.id_Pessoa = v.id_Pesquisador";
+		String sql = 	"select v.* from VACINACAO.VACINA v";
 		if(seletor.temFiltro()) {
 			sql = preencherFiltros(seletor,sql);
 		}
@@ -300,13 +298,11 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	}
 	
 	private String preencherFiltros(VacinaSeletor seletor, String sql) {
-		// Tem pelo menos um filtro
-		sql += " WHERE ";
-		boolean primeiro = true;
+				
+		sql += " inner join VACINACAO.PAIS p on v.id_Pais = p.id_Pais  "
+				+ 	"inner join VACINACAO.PESSOA pe on pe.id_Pessoa = v.id_Pesquisador WHERE ";
+		boolean primeiro = true;																								    		 // "WHERE"       Tem pelo menos um filtro.
 		if(seletor.getNomeVacina() != null && seletor.getNomeVacina().trim().length() > 0) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
 			sql += " UPPER(v.nome) LIKE UPPER ('%"+seletor.getNomeVacina()+"%')";
 			primeiro = false;
 		}
@@ -314,44 +310,44 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 			if(!primeiro) {
 				sql += " AND ";
 			}
-			sql = " UPPER(pe.nome)LIKE UPPER('%"+seletor.getNomePesquisador()+"%')";
+			sql += " UPPER(pe.nome) LIKE UPPER('%"+seletor.getNomePesquisador()+"%')";
+			primeiro = false;
 		}
 		if(seletor.getNomePais() != null && seletor.getNomePais().trim().length()>0) {
 			if(!primeiro) {
-				sql = " AND ";
+				sql += " AND ";
 			}
-			sql = " UPPER(p.nome)like UPPER('%"+seletor.getNomePais()+"%')";
+			sql += " UPPER(p.nome) like UPPER('%"+seletor.getNomePais()+"%')";
+		}
+		if(seletor.getDataDeInicioDaPesquisa() != null ) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " v.dataInicioDaPesquisa like '"+seletor.getDataDeInicioDaPesquisa()+"'";
 		}
 		return sql;
 	}
 	
 	private Vacina construirDoResultSet(ResultSet resultado) throws SQLException{
+		
 		Vacina vacina = new Vacina();
 		vacina.setIdVacina(resultado.getInt("id_Vacina"));
 		vacina.setNome(resultado.getString("nome"));
+		
 		if(resultado.getDate("dataInicioDaPesquisa") != null) {
 			vacina.setDataInicioPesquisa(resultado.getDate("dataInicioDaPesquisa").toLocalDate());	
 		}
 		vacina.setEstagioDaVacina(resultado.getInt("estagio_Da_Pesquisa"));
 		vacina.setMediaDaVacina(resultado.getDouble("mediaVacina"));
+		
 		PaisRepository paisRepository = new PaisRepository();
 		Pais paisDaVacina = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
 		vacina.setPais(paisDaVacina);
+		
 		PessoaRepository pessoaRepository = new PessoaRepository();
 		Pessoa pesquisadorResponsavel = pessoaRepository.consultarPorId(resultado.getInt("id_Pesquisador"));
 		vacina.setPesquisadorResponsavel(pesquisadorResponsavel);
+		
 		return vacina;
 	}
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

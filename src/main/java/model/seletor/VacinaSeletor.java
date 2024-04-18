@@ -1,10 +1,14 @@
 package model.seletor;
 
+import java.time.LocalDate;
+
 public class VacinaSeletor extends BaseSeletor{	
 	
 	private String nomePais;
 	private String nomePesquisador;
 	private String nomeVacina;
+	private LocalDate dataInicioPesquisaSeletor;
+	private LocalDate dataFinalPesquisaSeletor;
 	
 	public VacinaSeletor() {
 		
@@ -34,10 +38,13 @@ public class VacinaSeletor extends BaseSeletor{
 		this.nomeVacina = nomeVacina;
 	}
 	
+	
 	public boolean temFiltro() {
 		return (this.nomePais != null && this.nomePais.trim().length() > 0)
 					|| (this.nomePesquisador != null && this.nomePesquisador.trim().length()>0)
-					|| (this.nomeVacina != null && this.nomeVacina.trim().length() > 0);
+					|| (this.nomeVacina != null && this.nomeVacina.trim().length() > 0)
+					|| (this.dataInicioPesquisaSeletor != null)
+					|| (this.dataFinalPesquisaSeletor != null);
 	}
 	
 }
