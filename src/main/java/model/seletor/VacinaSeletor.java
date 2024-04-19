@@ -11,7 +11,6 @@ public class VacinaSeletor extends BaseSeletor{
 	private LocalDate dataFinalPesquisaSeletor;
 	
 	public VacinaSeletor() {
-		
 	}
 
 	public String getNomePais() {
@@ -37,8 +36,23 @@ public class VacinaSeletor extends BaseSeletor{
 	public void setNomeVacina(String nomeVacina) {
 		this.nomeVacina = nomeVacina;
 	}
-	
-	
+
+	public LocalDate getDataInicioPesquisaSeletor() {
+		return dataInicioPesquisaSeletor;
+	}
+
+	public void setDataInicioPesquisaSeletor(LocalDate dataInicioPesquisaSeletor) {
+		this.dataInicioPesquisaSeletor = dataInicioPesquisaSeletor;
+	}
+
+	public LocalDate getDataFinalPesquisaSeletor() {
+		return dataFinalPesquisaSeletor;
+	}
+
+	public void setDataFinalPesquisaSeletor(LocalDate dataFinalPesquisaSeletor) {
+		this.dataFinalPesquisaSeletor = dataFinalPesquisaSeletor;
+	}
+
 	public boolean temFiltro() {
 		return (this.nomePais != null && this.nomePais.trim().length() > 0)
 					|| (this.nomePesquisador != null && this.nomePesquisador.trim().length()>0)
@@ -46,5 +60,4 @@ public class VacinaSeletor extends BaseSeletor{
 					|| (this.dataInicioPesquisaSeletor != null)
 					|| (this.dataFinalPesquisaSeletor != null);
 	}
-	
 }
