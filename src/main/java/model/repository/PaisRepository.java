@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import model.entity.Pais;
+import model.entity.Pessoa;
+import model.entity.Vacina;
 
 
 public class PaisRepository implements BaseRepository<Pais> {
@@ -70,8 +72,31 @@ public class PaisRepository implements BaseRepository<Pais> {
 
 	@Override
 	public ArrayList<Pais> consultarTodos() {
-		// TODO Stub de método gerado automaticamente
-		return null;
+		ArrayList<Pais> paises = new ArrayList<Pais>();
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		String query = "select * from VACINACAO.PAIS";
+		try{
+			resultado = stmt.executeQuery(query);
+			while(resultado.next()){
+				Pais pais = new Pais();
+				pais.setId_Pais(resultado.getInt("id_Pais"));
+				pais.setNome(resultado.getString("nome"));
+				pais.setSigla(resultado.getString("sigla"));
+				paises.add(pais);
+			}
+		} catch (SQLException erro){
+			System.out.println("Erro ao executar consultar todos os países.");
+			System.out.println("Erro: " + erro.getMessage());
+		} finally {
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return paises;
 	}
+	
+	
 	
 }

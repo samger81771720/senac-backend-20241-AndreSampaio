@@ -1,5 +1,8 @@
 package controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import exception.ControleVacinasException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -10,27 +13,35 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import model.entity.Pais;
 import model.entity.Pessoa;
+import model.entity.Vacina;
 import model.service.PaisService;
 
 @Path("/pais")
 public class PaisController {
 
- private PaisService service = new PaisService();
+ private PaisService paisService = new PaisService();
 	
 	@GET
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Pais consultarPorId(@PathParam("id")int id) throws ControleVacinasException{
-		return service.consultarPorId(id);
+		return paisService.consultarPorId(id);
 	}
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Pais salvar(Pais novoPais) throws ControleVacinasException {
-		return service.salvar(novoPais);
+		return paisService.salvar(novoPais);
 	}
 	
+	@GET
+	@Path("/consultarTodos")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ArrayList<Pais> consultarTodos() {
+		return paisService.consultarTodos();
+	}
+
 }
 

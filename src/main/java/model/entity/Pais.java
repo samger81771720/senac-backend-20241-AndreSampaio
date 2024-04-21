@@ -6,7 +6,7 @@ public class Pais {
 	private String nome;
 	private String sigla;
 	
-	public Pais(String nome, String sigla) {
+	public Pais(String nome, String sigla, Pessoa pessoa) {
 		super();
 		this.nome = nome;
 		this.sigla = sigla;
@@ -36,5 +36,5 @@ public class Pais {
 	public void setId_Pais(int id_Pais) {
 		this.id_Pais = id_Pais;
 	}
-	
+
 }
