@@ -1,5 +1,6 @@
 package controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import exception.ControleVacinasException;
 import jakarta.ws.rs.Consumes;
@@ -51,6 +52,12 @@ public class PessoaController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Pessoa> consultarTodas(){
 		 return service.consultarTodos();
+	}
+	
+	@GET
+	@Path("/pesquisadores")
+	public  ArrayList<Pessoa> consultarPesquisadores(){
+		 return service.consultarPesquisadores();
 	}
 	
 }

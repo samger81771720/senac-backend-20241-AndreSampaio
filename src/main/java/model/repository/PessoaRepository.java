@@ -7,14 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import model.entity.Aplicacao;
 import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;
+import model.service.PessoaService;
 /*
  "PreparedStatement" - É o agente que encapsula e em seguida executa a consulta no banco de dados.
  */
+
 
 public class PessoaRepository implements BaseRepository<Pessoa>{
 	
@@ -226,6 +229,41 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		}
 		return pessoas;
 	}
+	
+	public ArrayList<Pessoa> consultarPesquisadores() {
+		ArrayList<Pessoa> pessoas = new ArrayList<Pessoa>();
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		String query = " SELECT * FROM VACINACAO.PESSOA WHERE TIPO = "+PessoaService.PESQUISADOR;
+		try{
+			resultado = stmt.executeQuery(query);
+			PaisRepository paisRepository = new PaisRepository();
+			while(resultado.next()){
+				Pessoa pessoa = new Pessoa();
+				pessoa.setIdPessoa(resultado.getInt("id_Pessoa"));
+				Pais paisDaPessoa = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
+				pessoa.setPais(paisDaPessoa);
+				pessoa.setTipo(Integer.parseInt(resultado.getString("tipo")));
+				pessoa.setNome(resultado.getString("nome"));
+				if(resultado.getDate("dataNascimento")!=null) {
+					pessoa.setDataNascimento(resultado.getDate("dataNascimento").toLocalDate());
+				}
+				pessoa.setSexo(resultado.getString("sexo"));
+				pessoa.setCpf(resultado.getString("cpf"));
+				pessoas.add(pessoa);
+			}
+		} catch (SQLException erro){
+			System.out.println("Erro ao executar consultar todas as pessoas");
+			System.out.println("Erro: " + erro.getMessage());
+		} finally {
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			
+		}
+		return pessoas;
+	}
+	
 	
 }
 

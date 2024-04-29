@@ -20,6 +20,7 @@ exceções ou também declarar que podem lançá-las.*/
 
 package model.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import exception.ControleVacinasException;
 import model.entity.Pessoa;
@@ -30,7 +31,7 @@ public class PessoaService {
 	
 	private static final String SEXO_MASCULINO = "m";
 	private static final String SEXO_FEMININO = "f";
-	private static final int PESQUISADOR = 1 ;
+	public static final int PESQUISADOR = 1 ;
 	private static final int VOLUNTARIO = 2 ;
 	private static final int PUBLICO_GERAL = 3;
 	
@@ -177,6 +178,10 @@ public class PessoaService {
 	// OK - FUNCIONANDO!
 	public List<Pessoa> consultarTodos() {
 		return pessoaRepository.consultarTodos();
+	}
+	
+	public  ArrayList<Pessoa> consultarPesquisadores() {
+		return pessoaRepository.consultarPesquisadores();
 	}
 
 }

@@ -15,7 +15,6 @@ public class Pessoa {
 	private Pais pais;
 	private ArrayList<Aplicacao>aplicacoesNaPessoa;
 	
-	
 	public Pessoa() {
 		super();
 	}

@@ -27,7 +27,7 @@ public class VacinaController {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Vacina Salvar(Vacina novaVacina) throws ControleVacinasException{
+	public Vacina salvar(Vacina novaVacina) throws ControleVacinasException{
 		return vacinaService.salvar(novaVacina);
 	}
 	
