@@ -13,6 +13,8 @@ import model.entity.Aplicacao;
 import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;
+import model.seletor.PessoaSeletor;
+import model.seletor.VacinaSeletor;
 import model.service.PessoaService;
 /*
  "PreparedStatement" - É o agente que encapsula e em seguida executa a consulta no banco de dados.
@@ -264,6 +266,99 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		return pessoas;
 	}
 	
+	public ArrayList<Pessoa> consultarComFiltros(PessoaSeletor seletor){
+		ArrayList<Pessoa> pessoas = new ArrayList<Pessoa>();
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		String sql = 	"select pe.* from VACINACAO.PESSOA pe";
+		if(seletor.temFiltro()) {
+			sql = preencherFiltros(seletor,sql);
+		}
+		try {
+			resultado = stmt.executeQuery(sql);
+			while(resultado.next()) {
+				Pessoa pessoa = construirDoResultSet(resultado);
+				pessoas.add(pessoa);
+			}
+		} catch(SQLException erro){
+			System.out.println("Erro durante a execução do método \"consultarComFiltros\" ao consultar as pessoas do filtro selecionado.");
+			System.out.println("Erro: "+erro.getMessage());
+		} finally{
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return pessoas;
+	}
+	
+	private String preencherFiltros(PessoaSeletor seletor, String sql) {
+		
+		sql += " inner join VACINACAO.PAIS p on p.id_Pais = pe.id_Pais WHERE ";
+		
+		boolean primeiro = true;																								    															 // "WHERE"       Tem pelo menos um filtro.
+	
+		if(seletor.getNomePessoa() != null && seletor.getNomePessoa().trim().length() > 0) {
+			sql += " UPPER(pe.nome) LIKE UPPER ('%"+seletor.getNomePessoa()+"%')";  
+			primeiro = false;
+		}
+		if(seletor.getTipoDaPessoa() != 0) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += "pe.tipo LIKE " + seletor.getTipoDaPessoa() + ""; 
+			primeiro = false;
+		}
+		if(seletor.getSexodaPessoa() != null && seletor.getSexodaPessoa().trim().length()>0) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " UPPER(pe.sexo) LIKE UPPER('%"+seletor.getSexodaPessoa()+"%')";
+		}
+		if(seletor.getPaisDaPessoa() != null && seletor.getPaisDaPessoa().trim().length()>0) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " UPPER(p.nome) LIKE UPPER ('%"+seletor.getPaisDaPessoa()+"%')";
+		}
+		if(seletor.getDataNascimentoInicialPesquisaSeletor() != null && seletor.getDataNascimentoFinalPesquisaSeletor() != null) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " pe.dataNascimento between '"+Date.valueOf(seletor.getDataNascimentoInicialPesquisaSeletor())
+			+"' AND '"+ Date.valueOf(seletor.getDataNascimentoFinalPesquisaSeletor()) +"'" ;
+		} else  if(seletor.getDataNascimentoInicialPesquisaSeletor() != null) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " pe.dataNascimento >= '" + Date.valueOf(seletor.getDataNascimentoInicialPesquisaSeletor()) + "'" ;
+		} else 	if(seletor.getDataNascimentoFinalPesquisaSeletor() != null) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " pe.dataNascimento <= '" +  Date.valueOf(seletor.getDataNascimentoFinalPesquisaSeletor()) + "'" ;
+		}
+		return sql;
+	}
+	
+private Pessoa construirDoResultSet(ResultSet resultado) throws SQLException{
+		
+		Pessoa pessoa = new Pessoa();
+		pessoa.setIdPessoa(resultado.getInt("id_Pessoa"));
+		pessoa.setTipo(resultado.getInt("tipo"));
+		pessoa.setNome(resultado.getString("nome"));
+		if(resultado.getDate("dataNascimento") != null) {
+			pessoa.setDataNascimento((resultado.getDate("dataNascimento").toLocalDate()));	
+		}
+		pessoa.setSexo(resultado.getString("sexo"));
+		pessoa.setCpf(resultado.getString("cpf"));
+		PaisRepository paisRepository = new PaisRepository();
+		Pais paisDaPessoa = paisRepository.consultarPorId(resultado.getInt("id_Pais"));
+		pessoa.setPais(paisDaPessoa);
+		
+		return pessoa;
+	
+	}
 	
 }
 

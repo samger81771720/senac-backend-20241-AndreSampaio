@@ -7,12 +7,12 @@ import java.util.ArrayList;
 public class Pessoa {
 	
 	private int idPessoa;
-	private int tipo;
+	private int tipo; 
 	private String nome;
-	private LocalDate dataNascimento;
-	private String sexo;
+	private LocalDate dataNascimento; 
+	private String sexo; 
 	private String cpf;
-	private Pais pais;
+	private Pais pais; 
 	private ArrayList<Aplicacao>aplicacoesNaPessoa;
 	
 	public Pessoa() {

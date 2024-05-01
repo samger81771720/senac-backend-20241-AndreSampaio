@@ -26,14 +26,15 @@ import exception.ControleVacinasException;
 import model.entity.Pessoa;
 import model.repository.AplicacaoRepository;
 import model.repository.PessoaRepository;
+import model.seletor.PessoaSeletor;
 
 public class PessoaService {
 	
-	private static final String SEXO_MASCULINO = "m";
-	private static final String SEXO_FEMININO = "f";
+	public static final String SEXO_MASCULINO = "m";
+	public static final String SEXO_FEMININO = "f";
 	public static final int PESQUISADOR = 1 ;
-	private static final int VOLUNTARIO = 2 ;
-	private static final int PUBLICO_GERAL = 3;
+	public static final int VOLUNTARIO = 2 ;
+	public static final int PUBLICO_GERAL = 3;
 	
 	private PessoaRepository pessoaRepository = new PessoaRepository();
 	
@@ -155,16 +156,22 @@ public class PessoaService {
 	}
 	
 	public boolean excluir(int id) throws ControleVacinasException{
+		consultarTipoDePessoa(id);
 		verificarSeTomouPrimeiraDose(id); 
-
 		return pessoaRepository.excluir(id);
 	}
 	
 	// Pessoa não pode ser excluída caso já tenha recebido pelo menos uma dose vacina; 
 	private void verificarSeTomouPrimeiraDose(int id) throws ControleVacinasException {
 		if(aplicacaoRepository.consultarTodasAplicacoesDaPessoa(id).size()>0) {
-			throw new ControleVacinasException("Não é possível excluir a pessoa, pois já possui um registro de vacina, ok?");
+			throw new ControleVacinasException("Não é possível excluir a pessoa, pois já possui um registro de vacina.");
 		} 
+	}
+	
+	private void consultarTipoDePessoa(int id) throws ControleVacinasException{
+		if(pessoaRepository.consultarPorId(id).getTipo()==PESQUISADOR) {
+			throw new ControleVacinasException("Não é possível excluir um pesquisador do cadastro no banco de dados.");
+		}
 	}
 	
 	// OK - FUNCIONANDO!
@@ -182,6 +189,10 @@ public class PessoaService {
 	
 	public  ArrayList<Pessoa> consultarPesquisadores() {
 		return pessoaRepository.consultarPesquisadores();
+	}
+	
+	public ArrayList<Pessoa> consultarComFiltros(PessoaSeletor seletor){
+		return pessoaRepository.consultarComFiltros(seletor);
 	}
 
 }
