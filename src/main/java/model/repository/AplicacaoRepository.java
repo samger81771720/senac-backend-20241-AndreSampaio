@@ -57,7 +57,7 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 			pstmt.setInt(2, idVacina);
 			pstmt.executeUpdate();
 		}catch (Exception erro) {
-			System.out.println("Erro na tentaiva de atualizar o registro da média da vacina.");
+			System.out.println("Erro na tentativa de atualizar o registro da média da vacina.");
 			System.out.println("Erro: "+ erro);
 		}finally {
 			Banco.closePreparedStatement(pstmt);
@@ -70,18 +70,18 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
-		String query = "select * from VACINACAO.APLICACAO_VACINA where id_Vacina = " + id;
+		String query = "select  *  from VACINACAO.APLICACAO_VACINA where id_Vacina = " + id;
 		try{
 			resultado = stmt.executeQuery(query);
 			double somatorioDasAvaliacoes = 0;
-			double contagemDasAvaliacoes=0;
+			double totalAplicacoes = 0;
 			while(resultado.next()){
 				Aplicacao aplicacao = new Aplicacao();
 				aplicacao.setAvaliacaoReacao(resultado.getInt("avaliacaoDaReacao"));
 				somatorioDasAvaliacoes += aplicacao.getAvaliacaoReacao();
-				contagemDasAvaliacoes ++;
-				mediaDeAvaliacaoDaVacina = somatorioDasAvaliacoes/contagemDasAvaliacoes;
+				totalAplicacoes ++;
 			}
+			mediaDeAvaliacaoDaVacina = somatorioDasAvaliacoes/totalAplicacoes;
 		} catch (SQLException erro){
 			System.out.println("Erro ao executar o cálculo de média das avaliações da vacina.");
 			System.out.println("Erro: " + erro.getMessage());
