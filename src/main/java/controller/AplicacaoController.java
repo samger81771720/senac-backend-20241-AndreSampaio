@@ -13,7 +13,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import model.entity.Aplicacao;
-import model.entity.Pessoa;
 import model.service.AplicacaoService;
 
 @Path("/aplicacao")
@@ -48,7 +47,7 @@ public class AplicacaoController {
 	}
 	
 	@GET
-	@Path("/consultarTodos")
+	@Path("/consultarTodas")
 	@Produces(MediaType.APPLICATION_JSON)
 	public ArrayList<Aplicacao> consultarTodos(){
 		return service.consultarTodos();

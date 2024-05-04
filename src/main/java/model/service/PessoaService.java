@@ -32,6 +32,7 @@ public class PessoaService {
 	
 	public static final String SEXO_MASCULINO = "m";
 	public static final String SEXO_FEMININO = "f";
+	public static final String SEXO_OUTRO = "o";
 	public static final int PESQUISADOR = 1 ;
 	public static final int VOLUNTARIO = 2 ;
 	public static final int PUBLICO_GERAL = 3;
@@ -120,7 +121,11 @@ public class PessoaService {
 	    if (novaPessoa.getDataNascimento() == null) {
 	        mensagemValidacao += " - O campo data de nascimento precisa ser preenchido. \n";
 	    }
-	    if (!novaPessoa.getSexo().toLowerCase().equals(SEXO_MASCULINO) && !novaPessoa.getSexo().toLowerCase().equals(SEXO_FEMININO)) {
+	    if (
+	    		!novaPessoa.getSexo().toLowerCase().equals(SEXO_MASCULINO) && 
+	    		!novaPessoa.getSexo().toLowerCase().equals(SEXO_FEMININO) &&
+	    		!novaPessoa.getSexo().toLowerCase().equals(SEXO_OUTRO)
+	    		) {
 	        mensagemValidacao += " - O campo sexo precisa ser informado apenas com um dois valores que são: \"M\" ou \"F\". \n";
 	    }
 	   if(novaPessoa.getNome().trim().isEmpty()) {

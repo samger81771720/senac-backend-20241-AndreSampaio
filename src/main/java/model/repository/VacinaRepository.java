@@ -240,48 +240,51 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	}
 	
 	private String preencherFiltros(VacinaSeletor seletor, String sql) {
-				
-		sql += " inner join VACINACAO.PAIS p on v.id_Pais = p.id_Pais  "
-			   + 	 "inner join VACINACAO.PESSOA pe on pe.id_Pessoa = v.id_Pesquisador WHERE ";
-		
-		boolean primeiro = true;																								    		 // "WHERE"       Tem pelo menos um filtro.
-	
-		if(seletor.getNomeVacina() != null && seletor.getNomeVacina().trim().length() > 0) {
-			sql += " UPPER(v.nome) LIKE UPPER ('%"+seletor.getNomeVacina()+"%')";
-			primeiro = false;
-		}
-		if(seletor.getNomePesquisador() != null && seletor.getNomePesquisador().trim().length()>0) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " UPPER(pe.nome) LIKE UPPER('%"+seletor.getNomePesquisador()+"%')";
-			primeiro = false;
-		}
-		if(seletor.getNomePais() != null && seletor.getNomePais().trim().length()>0) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " UPPER(p.nome) like UPPER('%"+seletor.getNomePais()+"%')";
-		}
-		if(seletor.getDataInicioPesquisaSeletor() != null && seletor.getDataFinalPesquisaSeletor() != null) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " v.dataInicioDaPesquisa between '"+Date.valueOf(seletor.getDataInicioPesquisaSeletor())
-			+"' AND '"+ Date.valueOf(seletor.getDataFinalPesquisaSeletor()) +"'" ;
-		} else 	if(seletor.getDataInicioPesquisaSeletor() != null) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " v.dataInicioDaPesquisa >= '" + Date.valueOf(seletor.getDataInicioPesquisaSeletor()) + "'" ;
-		} else 	if(seletor.getDataFinalPesquisaSeletor() != null) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " v.dataInicioDaPesquisa <= '" +  Date.valueOf(seletor.getDataFinalPesquisaSeletor()) + "'" ;
-		}
-		return sql;
+	    
+		final String AND = " AND ";
+
+	    sql += " INNER JOIN VACINACAO.PAIS p ON v.id_Pais = p.id_Pais "
+	            + " INNER JOIN VACINACAO.PESSOA pe ON pe.id_Pessoa = v.id_Pesquisador WHERE ";
+
+	    boolean primeiro = true;
+
+	    if (seletor.getNomeVacina() != null && seletor.getNomeVacina().trim().length() > 0) {
+	        sql += " UPPER(v.nome) LIKE UPPER ('%" + seletor.getNomeVacina() + "%')";
+	        primeiro = false;
+	    }
+	    if (seletor.getNomePesquisador() != null && seletor.getNomePesquisador().trim().length() > 0) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " UPPER(pe.nome) LIKE UPPER('%" + seletor.getNomePesquisador() + "%')";
+	        primeiro = false;
+	    }
+	    if (seletor.getNomePais() != null && seletor.getNomePais().trim().length() > 0) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " UPPER(p.nome) LIKE UPPER('%" + seletor.getNomePais() + "%')";
+	    }
+	    if (seletor.getDataInicioPesquisaSeletor() != null && seletor.getDataFinalPesquisaSeletor() != null) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " v.dataInicioDaPesquisa BETWEEN '" + Date.valueOf(seletor.getDataInicioPesquisaSeletor())
+	                + "' AND '" + Date.valueOf(seletor.getDataFinalPesquisaSeletor()) + "'";
+	    } else if (seletor.getDataInicioPesquisaSeletor() != null) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " v.dataInicioDaPesquisa >= '" + Date.valueOf(seletor.getDataInicioPesquisaSeletor()) + "'";
+	    } else if (seletor.getDataFinalPesquisaSeletor() != null) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " v.dataInicioDaPesquisa <= '" + Date.valueOf(seletor.getDataFinalPesquisaSeletor()) + "'";
+	    }
+	    return sql;
 	}
+
 	
 	private Vacina construirDoResultSet(ResultSet resultado) throws SQLException{
 		

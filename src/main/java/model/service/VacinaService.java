@@ -3,10 +3,8 @@ package model.service;
 import java.util.ArrayList;
 
 import exception.ControleVacinasException;
-import model.entity.Aplicacao;
 import model.entity.Vacina;
 import model.repository.AplicacaoRepository;
-import model.repository.PessoaRepository;
 import model.repository.VacinaRepository;
 import model.seletor.VacinaSeletor;
 

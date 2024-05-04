@@ -7,10 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import model.entity.Aplicacao;
 import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;
+import model.seletor.AplicacaoSeletor;
+import model.seletor.VacinaSeletor;
 
 public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 
@@ -184,7 +187,7 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 
 	@Override
 	public ArrayList<Aplicacao>consultarTodos(){
-		ArrayList<Aplicacao>listaDeAplicacoesDaPessoa = new ArrayList<Aplicacao>();
+		ArrayList<Aplicacao>listaDeAplicacoesDaPessoa = new ArrayList<>();
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		String query = "select * from VACINACAO.APLICACAO_VACINA";
@@ -214,7 +217,7 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 	}
 	
 	public ArrayList<Aplicacao> consultarTodasAplicacoesDaPessoa(int id) {
-		ArrayList<Aplicacao> aplicacoesDaPessoa = new ArrayList<Aplicacao>();
+		ArrayList<Aplicacao> aplicacoesDaPessoa = new ArrayList<>();
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
@@ -266,6 +269,103 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 			Banco.closeConnection(conn);
 		}
 		return aplicou;
+	}
+	
+	public ArrayList<Aplicacao> consultarComFiltros(AplicacaoSeletor seletor){
+		
+		ArrayList<Aplicacao> listaDeAplicacoes = new ArrayList<>();
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		ResultSet resultado = null;
+		String sql = 	"select p.* from VACINACAO.APLICACAO_VACINA p";
+		
+		if(seletor.temFiltro()) {
+			sql = preencherFiltros(seletor,sql);
+		}
+		try {
+			resultado = stmt.executeQuery(sql);
+			while(resultado.next()) {
+				Aplicacao aplicacao = construirDoResultSet(resultado);
+				listaDeAplicacoes.add(aplicacao);
+			}
+		} catch(SQLException erro){
+			System.out.println("Erro durante a execução do método \"consultarComFiltros\" ao consultar as aplicações do filtro selecionado.");
+			System.out.println("Erro: "+erro.getMessage());
+		} finally{
+			Banco.closeResultSet(resultado);
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return listaDeAplicacoes;
+	}
+	
+	/*
+	 
+	 * FALTA REMODELAR E ADAPTAR  ESSE MÉTODO ABAIXO PARA 
+	 * "public List<Aplicacao> consultarComFiltros(AplicacaoSeletor seletor){
+	    }"
+	 	
+	 	
+	 	private String preencherFiltros(VacinaSeletor seletor, String sql) {
+	    
+		final String AND = " AND ";
+
+	    sql += " INNER JOIN VACINACAO.PAIS p ON v.id_Pais = p.id_Pais "
+	            + " INNER JOIN VACINACAO.PESSOA pe ON pe.id_Pessoa = v.id_Pesquisador WHERE ";
+
+	    boolean primeiro = true;
+
+	    if (seletor.getNomeVacina() != null && seletor.getNomeVacina().trim().length() > 0) {
+	        sql += " UPPER(v.nome) LIKE UPPER ('%" + seletor.getNomeVacina() + "%')";
+	        primeiro = false;
+	    }
+	    if (seletor.getNomePesquisador() != null && seletor.getNomePesquisador().trim().length() > 0) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " UPPER(pe.nome) LIKE UPPER('%" + seletor.getNomePesquisador() + "%')";
+	        primeiro = false;
+	    }
+	    if (seletor.getNomePais() != null && seletor.getNomePais().trim().length() > 0) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " UPPER(p.nome) LIKE UPPER('%" + seletor.getNomePais() + "%')";
+	    }
+	    if (seletor.getDataInicioPesquisaSeletor() != null && seletor.getDataFinalPesquisaSeletor() != null) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " v.dataInicioDaPesquisa BETWEEN '" + Date.valueOf(seletor.getDataInicioPesquisaSeletor())
+	                + "' AND '" + Date.valueOf(seletor.getDataFinalPesquisaSeletor()) + "'";
+	    } else if (seletor.getDataInicioPesquisaSeletor() != null) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " v.dataInicioDaPesquisa >= '" + Date.valueOf(seletor.getDataInicioPesquisaSeletor()) + "'";
+	    } else if (seletor.getDataFinalPesquisaSeletor() != null) {
+	        if (!primeiro) {
+	            sql += AND;
+	        }
+	        sql += " v.dataInicioDaPesquisa <= '" + Date.valueOf(seletor.getDataFinalPesquisaSeletor()) + "'";
+	    }
+	    return sql;
+	}*/
+	
+	private Aplicacao construirDoResultSet(ResultSet resultado) throws SQLException{
+		
+		Aplicacao aplicacao = new Aplicacao();
+		aplicacao.setIdPessoa(resultado.getInt("id_Pessoa"));
+		VacinaRepository vacinaRepository = new VacinaRepository();
+		Vacina vacinaAplicada = vacinaRepository.consultarPorId(resultado.getInt("id_Vacina"));
+		aplicacao.setVacinaAplicada(vacinaAplicada);
+		if(resultado.getDate("dataAplicacao")!=null) {
+			aplicacao.setDataAplicacao(resultado.getDate("dataAplicacao").toLocalDate());
+		}
+		aplicacao.setAvaliacaoReacao(resultado.getInt("avaliacaoDaReacao"));
+		
+		return aplicacao;
+	
 	}
 	
 }
