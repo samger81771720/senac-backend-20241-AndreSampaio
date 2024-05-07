@@ -10,9 +10,6 @@ public class VacinaSeletor extends BaseSeletor{
 	private LocalDate dataInicioPesquisaSeletor;
 	private LocalDate dataFinalPesquisaSeletor;
 	
-	public VacinaSeletor() {
-	}
-
 	public String getNomePais() {
 		return nomePais;
 	}

@@ -3,7 +3,7 @@ package model.seletor;
 import java.time.LocalDate;
 import model.entity.Pais;
 
-public class PessoaSeletor {
+public class PessoaSeletor extends BaseSeletor{
 
 	private String nomePessoa; 
 	private int tipoDaPessoa; 

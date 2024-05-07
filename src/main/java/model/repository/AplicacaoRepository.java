@@ -277,10 +277,20 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
-		String sql = 	"select p.* from VACINACAO.APLICACAO_VACINA p";
+		String sql = 	"select * from VACINACAO.APLICACAO_VACINA";
 		
 		if(seletor.temFiltro()) {
 			sql = preencherFiltros(seletor,sql);
+		}
+		/*
+		  - Em SQL, a cláusula "LIMIT" é usada para restringir o número de linhas retornadas por uma consulta.
+		  
+		  - A cláusula OFFSET em SQL é usada em conjunto com a cláusula LIMIT para especificar a quantidade 
+		  de linhas a serem "ignoradas" no início do conjunto de resultados. Isso é útil quando você deseja pular 
+		  um número específico de linhas antes de começar a retornar os resultados da consulta.
+		  */
+		if(seletor.temPaginacao()) {
+			sql += " LIMIT " + seletor.getLimite() + " OFFSET " + seletor.getOffSet(); 
 		}
 		try {
 			resultado = stmt.executeQuery(sql);
@@ -299,58 +309,47 @@ public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 		return listaDeAplicacoes;
 	}
 	
-	/*
-	 
-	 * FALTA REMODELAR E ADAPTAR  ESSE MÉTODO ABAIXO PARA 
-	 * "public List<Aplicacao> consultarComFiltros(AplicacaoSeletor seletor){
-	    }"
-	 	
-	 	
-	 	private String preencherFiltros(VacinaSeletor seletor, String sql) {
+	private String preencherFiltros(AplicacaoSeletor seletor, String sql) {
 	    
 		final String AND = " AND ";
-
-	    sql += " INNER JOIN VACINACAO.PAIS p ON v.id_Pais = p.id_Pais "
-	            + " INNER JOIN VACINACAO.PESSOA pe ON pe.id_Pessoa = v.id_Pesquisador WHERE ";
+		
+		sql += "select ap.* from VACINACAO.APLICACAO_VACINA ap "
+				+ "inner join VACINACAO.PESSOA p on ap.id_Pessoa  = p.id_Pessoa "
+				+ "inner join VACINACAO.VACINA v on v.id_Vacina = ap.id_Vacina "
+				+ " WHERE ";
 
 	    boolean primeiro = true;
 
-	    if (seletor.getNomeVacina() != null && seletor.getNomeVacina().trim().length() > 0) {
-	        sql += " UPPER(v.nome) LIKE UPPER ('%" + seletor.getNomeVacina() + "%')";
+	    if (seletor.getVacinaUsadaNaAplicacao() != null && seletor.getVacinaUsadaNaAplicacao().trim().length() > 0) {
+	        sql += " UPPER(v.nome) LIKE UPPER ('%" + seletor.getVacinaUsadaNaAplicacao() + "%')";
 	        primeiro = false;
 	    }
-	    if (seletor.getNomePesquisador() != null && seletor.getNomePesquisador().trim().length() > 0) {
+	    if (seletor.getPessoaQueRecebeu() != null && seletor.getPessoaQueRecebeu().trim().length() > 0) {
 	        if (!primeiro) {
 	            sql += AND;
 	        }
-	        sql += " UPPER(pe.nome) LIKE UPPER('%" + seletor.getNomePesquisador() + "%')";
+	        sql += " UPPER(p.nome) LIKE UPPER('%" + seletor.getPessoaQueRecebeu() + "%')";
 	        primeiro = false;
 	    }
-	    if (seletor.getNomePais() != null && seletor.getNomePais().trim().length() > 0) {
+	    if (seletor.getDataInicialDaAplicacaoDaVacina() != null && seletor.getDataFinalDaAplicacaoDaVacina() != null) {
 	        if (!primeiro) {
 	            sql += AND;
 	        }
-	        sql += " UPPER(p.nome) LIKE UPPER('%" + seletor.getNomePais() + "%')";
-	    }
-	    if (seletor.getDataInicioPesquisaSeletor() != null && seletor.getDataFinalPesquisaSeletor() != null) {
+	        sql += " ap.dataAplicacao BETWEEN '" + Date.valueOf(seletor.getDataInicialDaAplicacaoDaVacina())
+	                + "' AND '" + Date.valueOf(seletor.getDataFinalDaAplicacaoDaVacina()) + "'";
+	    } else if (seletor.getDataInicialDaAplicacaoDaVacina() != null) {
 	        if (!primeiro) {
 	            sql += AND;
 	        }
-	        sql += " v.dataInicioDaPesquisa BETWEEN '" + Date.valueOf(seletor.getDataInicioPesquisaSeletor())
-	                + "' AND '" + Date.valueOf(seletor.getDataFinalPesquisaSeletor()) + "'";
-	    } else if (seletor.getDataInicioPesquisaSeletor() != null) {
+	        sql += " ap.dataAplicacao >= '" + Date.valueOf(seletor.getDataInicialDaAplicacaoDaVacina()) + "'";
+	    } else if (seletor.getDataFinalDaAplicacaoDaVacina() != null) {
 	        if (!primeiro) {
 	            sql += AND;
 	        }
-	        sql += " v.dataInicioDaPesquisa >= '" + Date.valueOf(seletor.getDataInicioPesquisaSeletor()) + "'";
-	    } else if (seletor.getDataFinalPesquisaSeletor() != null) {
-	        if (!primeiro) {
-	            sql += AND;
-	        }
-	        sql += " v.dataInicioDaPesquisa <= '" + Date.valueOf(seletor.getDataFinalPesquisaSeletor()) + "'";
+	        sql += " dataAplicacao <= '" + Date.valueOf(seletor.getDataFinalDaAplicacaoDaVacina()) + "'";
 	    }
 	    return sql;
-	}*/
+	}
 	
 	private Aplicacao construirDoResultSet(ResultSet resultado) throws SQLException{
 		

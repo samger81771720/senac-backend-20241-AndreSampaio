@@ -6,9 +6,7 @@ public abstract class BaseSeletor {
 	private int limite;
 	
 	public BaseSeletor() {
-		// "this.limite" - Determina a página inicial a ser lida
 		this.pagina = 0;
-		// "this.limite" - Determina o máximo de registros a retornar
 		this.limite = 0;
 	}
 
@@ -28,6 +26,7 @@ public abstract class BaseSeletor {
 		this.limite = limite;
 	}
 	
+	//Método da classe BaseSeletor utilizado para verificar se há paginação
 	public boolean temPaginacao() {
 		return this.limite > 0 && this.pagina > 0;
 	}
