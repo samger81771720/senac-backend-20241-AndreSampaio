@@ -54,4 +54,13 @@ public class VacinaService {
 	public ArrayList<Vacina> consultarComFiltros(VacinaSeletor seletor){
 		return vacinaRepository.consultarComFiltros(seletor);
 	}
+	
+	public int contarTotalRegistros(VacinaSeletor seletor) {
+		return vacinaRepository.contarTotalRegistros(seletor);
+	}
+	
+	public int contarPaginas(VacinaSeletor seletor) {
+		return this.vacinaRepository.contarPaginas(seletor);
+	}
+
 }

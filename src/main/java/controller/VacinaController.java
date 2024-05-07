@@ -73,4 +73,18 @@ public class VacinaController {
 		return vacinaService.consultarComFiltros(seletor);
 	}
 	
+	@POST
+	@Path("/contabilizar-total-registros")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public int contarTotalRegistros(VacinaSeletor seletor) {
+		return vacinaService.contarTotalRegistros(seletor);
+	}
+	
+	@POST
+	@Path("/total-paginas")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public int contarPaginas(VacinaSeletor seletor) {
+		return this.vacinaService.contarPaginas(seletor);
+	}
+	
 }

@@ -214,7 +214,7 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	}
 	
 	public ArrayList<Vacina> consultarComFiltros(VacinaSeletor seletor){
-		ArrayList<Vacina> vacinas = new ArrayList<Vacina>();
+		ArrayList<Vacina> vacinas = new ArrayList<>();
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
@@ -230,7 +230,8 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 		  um número específico de linhas antes de começar a retornar os resultados da consulta.
 		  */
 		if(seletor.temPaginacao()) {
-			sql += " LIMIT " + seletor.getLimite() + " OFFSET " + seletor.getOffSet(); 
+			sql += " LIMIT " + seletor.getLimite(); 
+			sql += " OFFSET " + seletor.getOffSet();
 		}
 		try {
 			resultado = stmt.executeQuery(sql);
@@ -239,7 +240,9 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 				vacinas.add(vacina);
 			}
 		} catch(SQLException erro){
-			System.out.println("Erro durante a execução do método \"consultarComFiltros\" ao consultar as vacinas do filtro selecionado.");
+			System.out.println(
+					"Erro durante a execução do método \"consultarComFiltros\" ao consultar as vacinas do filtro selecionado."
+					);
 			System.out.println("Erro: "+erro.getMessage());
 		} finally{
 			Banco.closeResultSet(resultado);
@@ -295,7 +298,6 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	    return sql;
 	}
 
-	
 	private Vacina construirDoResultSet(ResultSet resultado) throws SQLException{
 		
 		Vacina vacina = new Vacina();
@@ -316,6 +318,51 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 		
 		return vacina;
 	
+	}
+	
+	public int contarTotalRegistros(VacinaSeletor seletor) {
+		
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		
+		int totalRegistros = 0;
+		ResultSet resultado = null;
+		String query = "select count(v.id_Vacina) from VACINACAO.VACINA v "
+								  + "inner join VACINACAO.PAIS p on P.id_Pais  = V.id_Pais "
+								  + "inner join VACINACAO.PESSOA pe on pe.id_Pessoa = v.id_Pesquisador";
+		
+		if(seletor.temFiltro()) {
+			query +=  preencherFiltros(seletor, query);
+		}
+		
+		try {
+			resultado = stmt.executeQuery(query);
+			if(resultado.next()) {
+				totalRegistros = resultado.getInt(1);
+			}
+		} catch (SQLException erro){
+				System.out.println("Erro ao contar as vacinas filtradas");
+				System.out.println("Erro: " + erro.getMessage());
+			} finally {
+				Banco.closeResultSet(resultado);
+				Banco.closeStatement(stmt);
+				Banco.closeConnection(conn);
+			}
+		return totalRegistros;
+	}
+	
+	public int contarPaginas(VacinaSeletor seletor) {
+		
+		int totalPaginas = 0;
+		int totalRegistros = this.contarTotalRegistros(seletor);
+		totalPaginas = totalRegistros  / seletor.getLimite();
+		int resto = totalRegistros % seletor.getLimite();
+		
+		if(resto > 0) {
+			totalPaginas ++;
+		}
+		
+		return totalPaginas;
 	}
 
 }
