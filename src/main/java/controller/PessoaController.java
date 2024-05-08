@@ -15,6 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 import model.entity.Aplicacao;
 import model.entity.Pessoa;
 import model.seletor.PessoaSeletor;
+import model.seletor.VacinaSeletor;
 import model.service.PessoaService;
 
 @Path("/pessoa")
@@ -67,6 +68,20 @@ public class PessoaController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public ArrayList<Pessoa> consultarComFiltros(PessoaSeletor seletor){
 		return service.consultarComFiltros(seletor);
+	}
+	
+	@POST
+	@Path("/contabilizar-total-registros")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public int contarTotalRegistros(PessoaSeletor seletor) {
+		return this.service.contarTotalRegistros(seletor);
+	}
+	
+	@POST
+	@Path("/contabilizar-total-paginas")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public int contarPaginas(PessoaSeletor seletor) {
+		return this.service.contarPaginas(seletor);
 	}
 	
 }

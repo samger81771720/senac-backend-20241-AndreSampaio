@@ -199,5 +199,13 @@ public class PessoaService {
 	public ArrayList<Pessoa> consultarComFiltros(PessoaSeletor seletor){
 		return pessoaRepository.consultarComFiltros(seletor);
 	}
+	
+	public int contarTotalRegistros(PessoaSeletor seletor) {
+		return pessoaRepository.contarTotalRegistros(seletor);
+	}
+	
+	public int contarPaginas(PessoaSeletor seletor) {
+		return pessoaRepository.contarPaginas(seletor);
+	}
 
 }

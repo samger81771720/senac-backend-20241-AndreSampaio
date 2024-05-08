@@ -7,12 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
-
-import model.entity.Aplicacao;
 import model.entity.Pais;
 import model.entity.Pessoa;
-import model.entity.Vacina;
 import model.seletor.PessoaSeletor;
 import model.seletor.VacinaSeletor;
 import model.service.PessoaService;
@@ -267,11 +263,13 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 	}
 	
 	public ArrayList<Pessoa> consultarComFiltros(PessoaSeletor seletor){
-		ArrayList<Pessoa> pessoas = new ArrayList<Pessoa>();
+		
+		ArrayList<Pessoa> pessoas = new ArrayList<>();
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
 		String sql = 	"select pe.* from VACINACAO.PESSOA pe";
+		
 		if(seletor.temFiltro()) {
 			sql = preencherFiltros(seletor,sql);
 		}
@@ -285,6 +283,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		if(seletor.temPaginacao()) {
 			sql += " LIMIT " + seletor.getLimite() + " OFFSET " + seletor.getOffSet(); 
 		}
+		
 		try {
 			resultado = stmt.executeQuery(sql);
 			while(resultado.next()) {
@@ -300,6 +299,50 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 			Banco.closeConnection(conn);
 		}
 		return pessoas;
+	}
+	
+	public int contarTotalRegistros(PessoaSeletor seletor) {
+		
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		
+		int totalRegistros = 0;
+		ResultSet resultado = null;
+		String query = "select count(p.id_Pessoa) from VACINACAO.PESSOA p "
+								  + "inner join VACINACAO.PAIS pa on p.id_Pais = pa.id_Pais";
+		
+		if(seletor.temFiltro()) {
+			query +=  preencherFiltros(seletor, query);
+		}
+		
+		try {
+			resultado = stmt.executeQuery(query);
+			if(resultado.next()) {
+				totalRegistros = resultado.getInt(1);
+			}
+		} catch (SQLException erro){
+				System.out.println("Erro ao contabilizar o total de pessoas filtradas no método \"contarTotalRegistros\".");
+				System.out.println("Erro: " + erro.getMessage());
+			} finally {
+				Banco.closeResultSet(resultado);
+				Banco.closeStatement(stmt);
+				Banco.closeConnection(conn);
+			}
+		return totalRegistros;
+	}
+	
+	public int contarPaginas(PessoaSeletor seletor) {
+		
+		int totalPaginas = 0;
+		int totalRegistros = this.contarTotalRegistros(seletor);
+		totalPaginas = totalRegistros  / seletor.getLimite();
+		int resto = totalRegistros % seletor.getLimite();
+		
+		if(resto > 0) {
+			totalPaginas ++;
+		}
+		
+		return totalPaginas;
 	}
 	
 	private String preencherFiltros(PessoaSeletor seletor, String sql) {
@@ -367,8 +410,7 @@ private Pessoa construirDoResultSet(ResultSet resultado) throws SQLException{
 		pessoa.setPais(paisDaPessoa);
 		
 		return pessoa;
-	
 	}
-	
+
 }
 

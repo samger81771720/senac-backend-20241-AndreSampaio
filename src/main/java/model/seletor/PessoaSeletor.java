@@ -1,7 +1,6 @@
 package model.seletor;
 
 import java.time.LocalDate;
-import model.entity.Pais;
 
 public class PessoaSeletor extends BaseSeletor{
 
@@ -13,6 +12,7 @@ public class PessoaSeletor extends BaseSeletor{
 	private LocalDate dataNascimentoFinalPesquisaSeletor;
 
 	public PessoaSeletor() {
+		//constructor
 	}
 	
 	public String getNomePessoa() {
