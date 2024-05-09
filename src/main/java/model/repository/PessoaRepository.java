@@ -301,6 +301,55 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		return pessoas;
 	}
 	
+	private String preencherFiltros(PessoaSeletor seletor, String sql) {
+		
+		sql += " inner join VACINACAO.PAIS p on p.id_Pais = pe.id_Pais WHERE ";
+		
+		boolean primeiro = true;																			 // "WHERE"       Tem pelo menos um filtro.
+		
+		if(seletor.getPaisDaPessoa() != null && seletor.getPaisDaPessoa().trim().length()>0) {
+			sql += " UPPER(p.nome) LIKE UPPER ('%"+seletor.getPaisDaPessoa()+"%')";
+			primeiro = false;
+		}
+		if(seletor.getNomePessoa() != null && seletor.getNomePessoa().trim().length() > 0) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " UPPER(pe.nome) LIKE UPPER ('%"+seletor.getNomePessoa()+"%')";  
+		}
+		if(seletor.getTipoDaPessoa() != 0) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += "pe.tipo LIKE " + seletor.getTipoDaPessoa() + ""; 
+			primeiro = false;
+		}
+		if(seletor.getSexodaPessoa() != null && seletor.getSexodaPessoa().trim().length()>0) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " UPPER(pe.sexo) LIKE UPPER('%"+seletor.getSexodaPessoa()+"%')";
+		}
+		if(seletor.getDataNascimentoInicialPesquisaSeletor() != null && seletor.getDataNascimentoFinalPesquisaSeletor() != null) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " pe.dataNascimento between '"+Date.valueOf(seletor.getDataNascimentoInicialPesquisaSeletor())
+			+"' AND '"+ Date.valueOf(seletor.getDataNascimentoFinalPesquisaSeletor()) +"'" ;
+		} else  if(seletor.getDataNascimentoInicialPesquisaSeletor() != null) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " pe.dataNascimento >= '" + Date.valueOf(seletor.getDataNascimentoInicialPesquisaSeletor()) + "'" ;
+		} else 	if(seletor.getDataNascimentoFinalPesquisaSeletor() != null) {
+			if(!primeiro) {
+				sql += " AND ";
+			}
+			sql += " pe.dataNascimento <= '" +  Date.valueOf(seletor.getDataNascimentoFinalPesquisaSeletor()) + "'" ;
+		}
+		return sql;
+	}
+	
 	public int contarTotalRegistros(PessoaSeletor seletor) {
 		
 		Connection conn = Banco.getConnection();
@@ -345,56 +394,8 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		return totalPaginas;
 	}
 	
-	private String preencherFiltros(PessoaSeletor seletor, String sql) {
-		
-		sql += " inner join VACINACAO.PAIS p on p.id_Pais = pe.id_Pais WHERE ";
-		
-		boolean primeiro = true;																								    															 // "WHERE"       Tem pelo menos um filtro.
 	
-		if(seletor.getNomePessoa() != null && seletor.getNomePessoa().trim().length() > 0) {
-			sql += " UPPER(pe.nome) LIKE UPPER ('%"+seletor.getNomePessoa()+"%')";  
-			primeiro = false;
-		}
-		if(seletor.getTipoDaPessoa() != 0) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += "pe.tipo LIKE " + seletor.getTipoDaPessoa() + ""; 
-			primeiro = false;
-		}
-		if(seletor.getSexodaPessoa() != null && seletor.getSexodaPessoa().trim().length()>0) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " UPPER(pe.sexo) LIKE UPPER('%"+seletor.getSexodaPessoa()+"%')";
-		}
-		if(seletor.getPaisDaPessoa() != null && seletor.getPaisDaPessoa().trim().length()>0) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " UPPER(p.nome) LIKE UPPER ('%"+seletor.getPaisDaPessoa()+"%')";
-		}
-		if(seletor.getDataNascimentoInicialPesquisaSeletor() != null && seletor.getDataNascimentoFinalPesquisaSeletor() != null) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " pe.dataNascimento between '"+Date.valueOf(seletor.getDataNascimentoInicialPesquisaSeletor())
-			+"' AND '"+ Date.valueOf(seletor.getDataNascimentoFinalPesquisaSeletor()) +"'" ;
-		} else  if(seletor.getDataNascimentoInicialPesquisaSeletor() != null) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " pe.dataNascimento >= '" + Date.valueOf(seletor.getDataNascimentoInicialPesquisaSeletor()) + "'" ;
-		} else 	if(seletor.getDataNascimentoFinalPesquisaSeletor() != null) {
-			if(!primeiro) {
-				sql += " AND ";
-			}
-			sql += " pe.dataNascimento <= '" +  Date.valueOf(seletor.getDataNascimentoFinalPesquisaSeletor()) + "'" ;
-		}
-		return sql;
-	}
-	
-private Pessoa construirDoResultSet(ResultSet resultado) throws SQLException{
+	private Pessoa construirDoResultSet(ResultSet resultado) throws SQLException{
 		
 		Pessoa pessoa = new Pessoa();
 		pessoa.setIdPessoa(resultado.getInt("id_Pessoa"));
