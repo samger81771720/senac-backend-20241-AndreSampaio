@@ -61,8 +61,8 @@ public class PessoaService {
 	 */
 	// OK!
 	private void validarPessoaParaCadastro(Pessoa novaPessoa) throws ControleVacinasException {
-		verificar_CPF_Para_Cadastro(novaPessoa);
 		validarCamposPreenchidosDePessoa(novaPessoa);
+		verificar_CPF_Para_Cadastro(novaPessoa);
 	}
 	
 	/**
@@ -84,13 +84,13 @@ public class PessoaService {
 	 */
 	// OK !
 	private void verificar_CPF_Para_Cadastro(Pessoa pessoa) throws ControleVacinasException{
-       if(pessoaRepository.verificar_CPF_Para_Cadastro(pessoa)!=false) {
+       if(pessoaRepository.verificar_CPF_Para_Cadastro(pessoa)) {
         	throw new ControleVacinasException("O cpf "+pessoa.getCpf()+" de "+pessoa.getNome()+" já se encontra cadastrado no sistema.");
         } 
 	}
 	//OK !
 	private void verificar_CPF_Para_Atualizar(Pessoa novaPessoa) throws ControleVacinasException{
-	       if(pessoaRepository.verificar_CPF_Para_Atualizar(novaPessoa)!=true) {
+	       if(!pessoaRepository.verificar_CPF_Para_Atualizar(novaPessoa)) {
 	        	throw new ControleVacinasException("Não é possível alterar o número de cpf no cadastro.");
 	        } 
 	}
@@ -137,23 +137,8 @@ public class PessoaService {
 	    if(novaPessoa.getCpf().length()!=11) {
 	    	mensagemValidacao += " - O campo \"cpf\" precisa ter 11 números. \n";
 	    }
-	    if(!cpf.matches("[0-9]+")) {
+	    if(!novaPessoa.getNome().matches("^[a-zA-Z]+$")) {
 	    	mensagemValidacao += " - O campo \"cpf\" precisa ser preenchido apenas com números. \n";
-	    	/*O método matches() é um método fornecido pela classe String em Java, 
-	    	 que é usado para verificar se uma string corresponde a um determinado 
-	    	 padrão especificado por uma expressão regular. Ele retorna true se a string 
-	    	 corresponder ao padrão especificado. Ele retorna false se a string não corresponder 
-	    	 ao padrão. Expressão regular para verificar se o CPF contém apenas números:
-
-	    	A expressão regular "[0-9]+" é uma maneira de descrever um padrão de texto em que estamos 
-	    	procurando por um ou mais dígitos de 0 a 9. Aqui está o que cada parte significa:
-	    	[0-9]: Este é um conjunto de caracteres que inclui todos os dígitos de 0 a 9.
-	    	+: Este é um quantificador que indica que o padrão anterior (no nosso caso, [0-9]) deve aparecer 
-	    	uma ou mais vezes.
-	    	Portanto, a expressão regular "[0-9]+" corresponde a qualquer sequência de um ou mais dígitos 
-	    	de 0 a 9 em uma string. Quando aplicada à string do CPF, se ela contiver apenas dígitos de 0 a 9,
-	    	a expressão regular corresponderá a toda a string. Se houver outros caracteres, a correspondência falhará.
-	    	*/
 	    }
 	    if(!mensagemValidacao.isEmpty()) {
 	    	throw new ControleVacinasException("As observaçõe(s) a seguir precisa(m) ser atendida(s): \n"+mensagemValidacao);

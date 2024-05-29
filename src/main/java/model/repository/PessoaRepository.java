@@ -48,7 +48,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		 Statement stmt = Banco.getStatement(conn);
 		 ResultSet resultado = null;
 		 boolean cpfExiste = false;
-		 String query = "select PESSOA.cpf as CPF from VACINACAO.PESSOA where PESSOA.id_pessoa ="+novaPessoa.getIdPessoa();
+		 String query = "select PESSOA.cpf as CPF from VACINACAO.PESSOA where PESSOA.id_pessoa = "+novaPessoa.getIdPessoa();
 		 try {
 			 resultado = stmt.executeQuery(query);
 			 if(resultado.next() && resultado.getString("CPF").equals(novaPessoa.getCpf())){

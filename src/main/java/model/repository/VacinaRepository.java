@@ -223,10 +223,10 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 			sql = preencherFiltros(seletor,sql);
 		}
 		/*
-		  - Em SQL, a cláusula "LIMIT" é usada para restringir o número de linhas retornadas por uma consulta.
+		  - Em SQL, a cláusula "LIMIT" é usada para restringir o número de linhas(registros) retornadas por uma consulta.
 		  
 		  - A cláusula OFFSET em SQL é usada em conjunto com a cláusula LIMIT para especificar a quantidade 
-		  de linhas a serem "ignoradas" no início do conjunto de resultados. Isso é útil quando você deseja pular 
+		  de linhas(registros) a serem "ignoradas" no início do conjunto de resultados. Isso é útil quando você deseja pular 
 		  um número específico de linhas antes de começar a retornar os resultados da consulta.
 		  */
 		if(seletor.temPaginacao()) {
@@ -256,8 +256,8 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	    
 		final String AND = " AND ";
 
-	    sql += " INNER JOIN VACINACAO.PAIS p ON v.id_Pais = p.id_Pais "
-	            + " INNER JOIN VACINACAO.PESSOA pe ON pe.id_Pessoa = v.id_Pesquisador WHERE ";
+	    sql   += " INNER JOIN VACINACAO.PAIS p ON v.id_Pais = p.id_Pais "
+	              + " INNER JOIN VACINACAO.PESSOA pe ON pe.id_Pessoa = v.id_Pesquisador WHERE ";
 
 	    boolean primeiro = true;
 
