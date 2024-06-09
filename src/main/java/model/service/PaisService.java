@@ -24,5 +24,13 @@ public class PaisService {
 	public ArrayList<Pais> consultarTodos() {
 		return paisRepository.consultarTodos();
 	}
+	
+	public boolean excluir(int id) {
+		return paisRepository.excluir(id);
+	}
+	
+	public boolean alterar(Pais pais) {
+		return paisRepository.alterar(pais);
+	}
 
 }

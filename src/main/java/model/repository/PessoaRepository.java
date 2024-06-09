@@ -7,15 +7,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
 import model.entity.Pais;
 import model.entity.Pessoa;
 import model.seletor.PessoaSeletor;
-import model.seletor.VacinaSeletor;
 import model.service.PessoaService;
 /*
  "PreparedStatement" - É o agente que encapsula e em seguida executa a consulta no banco de dados.
  */
-
 
 public class PessoaRepository implements BaseRepository<Pessoa>{
 	
@@ -233,7 +232,7 @@ public class PessoaRepository implements BaseRepository<Pessoa>{
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;
-		String query = " SELECT * FROM VACINACAO.PESSOA WHERE TIPO = "+PessoaService.PESQUISADOR;
+		String query = " SELECT * FROM VACINACAO.PESSOA WHERE TIPO = " + PessoaService.PESQUISADOR;
 		try{
 			resultado = stmt.executeQuery(query);
 			PaisRepository paisRepository = new PaisRepository();

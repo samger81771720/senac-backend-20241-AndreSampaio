@@ -7,13 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 import model.entity.Aplicacao;
-import model.entity.Pais;
-import model.entity.Pessoa;
 import model.entity.Vacina;
 import model.seletor.AplicacaoSeletor;
-import model.seletor.VacinaSeletor;
 
 public class AplicacaoRepository implements BaseRepository<Aplicacao>{
 

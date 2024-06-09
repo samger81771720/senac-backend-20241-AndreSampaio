@@ -1,6 +1,7 @@
 package model.repository;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -60,14 +61,49 @@ public class PaisRepository implements BaseRepository<Pais> {
 
 	@Override
 	public boolean excluir(int id) {
-		// TODO Stub de método gerado automaticamente
-		return false;
+		Connection conn = Banco.getConnection();
+		Statement stmt = Banco.getStatement(conn);
+		boolean excluiu = false;
+		String query = "delete from VACINACAO.PAIS where PAIS.id_Pais = " + id;
+		try {
+			if(stmt.executeUpdate(query) == 1) {
+				excluiu = true;
+			}
+		} catch (SQLException erro) {
+			System.out.println("Erro ao tentar excluir o país do cadastro.");
+			System.out.println("Erro: " + erro.getMessage());
+		} finally {
+			Banco.closeStatement(stmt);
+			Banco.closeConnection(conn);
+		}
+		return excluiu;
 	}
 
 	@Override
-	public boolean alterar(Pais entidade) {
-		// TODO Stub de método gerado automaticamente
-		return false;
+	public boolean alterar(Pais pais) {
+	    boolean alterou = false;
+	    String query = " update "
+								    		+ " VACINACAO.PAIS "
+								    		+ " set "
+								    		+ " nome = ?, "
+								    		+ " sigla = ? "
+								    		+ " where "
+								    		+ " id_Pais = ? ";
+	    Connection conn = Banco.getConnection();
+	    PreparedStatement pstmt = Banco.getPreparedStatement(conn, query);
+	    try {
+	    	pstmt.setString(1, pais.getNome());
+	    	pstmt.setString(2, pais.getSigla());
+	        pstmt.setInt(3, pais.getId_Pais());
+	        alterou = pstmt.executeUpdate() > 0;
+	    } catch (SQLException erro) {
+	        System.out.println("Erro ao atualizar pais.");
+	        System.out.println("Erro: " + erro.getMessage());
+	    } finally {
+	        Banco.closeStatement(pstmt);
+	        Banco.closeConnection(conn);
+	    }
+	    return alterou;
 	}
 
 	@Override

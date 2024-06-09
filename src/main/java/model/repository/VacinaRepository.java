@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import model.entity.Pais;
 import model.entity.Pessoa;
 import model.entity.Vacina;
@@ -181,7 +180,7 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	
 	@Override
 	public ArrayList<Vacina> consultarTodos() {
-		ArrayList<Vacina> vacinas = new ArrayList<Vacina>();
+		ArrayList<Vacina> vacinas = new ArrayList<>();
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		ResultSet resultado = null;

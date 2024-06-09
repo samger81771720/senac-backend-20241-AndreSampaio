@@ -137,8 +137,8 @@ public class PessoaService {
 	    if(novaPessoa.getCpf().length()!=11) {
 	    	mensagemValidacao += " - O campo \"cpf\" precisa ter 11 números. \n";
 	    }
-	    if(!novaPessoa.getNome().matches("^[a-zA-Z]+$")) {
-	    	mensagemValidacao += " - O campo \"cpf\" precisa ser preenchido apenas com números. \n";
+	    if (!novaPessoa.getCpf().matches("^[0-9]+$")) {
+	        mensagemValidacao += " - O campo \"cpf\" precisa ser preenchido apenas com números. \n";
 	    }
 	    if(!mensagemValidacao.isEmpty()) {
 	    	throw new ControleVacinasException("As observaçõe(s) a seguir precisa(m) ser atendida(s): \n"+mensagemValidacao);

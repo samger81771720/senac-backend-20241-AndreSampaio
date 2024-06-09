@@ -5,8 +5,10 @@ import java.util.List;
 
 import exception.ControleVacinasException;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -41,6 +43,19 @@ public class PaisController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public ArrayList<Pais> consultarTodos() {
 		return paisService.consultarTodos();
+	}
+	
+	@DELETE
+	@Path("/{id}")
+	public boolean excluir(@PathParam("id") int id){
+		 return paisService.excluir(id);
+	}
+	
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
+	public boolean alterar(Pais pais) {
+		return paisService.alterar(pais);
 	}
 
 }
