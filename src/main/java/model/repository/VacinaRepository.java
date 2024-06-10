@@ -255,8 +255,7 @@ public class VacinaRepository implements BaseRepository<Vacina>{
 	    
 		final String AND = " AND ";
 
-	    sql   += " INNER JOIN VACINACAO.PAIS p ON v.id_Pais = p.id_Pais "
-	              + " INNER JOIN VACINACAO.PESSOA pe ON pe.id_Pessoa = v.id_Pesquisador WHERE ";
+	    sql   += " inner join VEICULOS.MONTADORA on VEICULOS.MONTADORA.ID = VEICULOS.CARRO.IDMONTADORA where ";
 
 	    boolean primeiro = true;
 
